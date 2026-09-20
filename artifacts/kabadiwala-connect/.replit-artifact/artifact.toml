@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Kabadiwala Connect"
+description = "A connected circular-economy platform with household scrap pickups, a simplified collector workflow, and municipal impact reporting."
+version = "1.0.0"
+id = "artifacts/kabadiwala-connect"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19716
+
+[services.development]
+run = "pnpm --filter @workspace/kabadiwala-connect run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/kabadiwala-connect", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/kabadiwala-connect/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19716"
+BASE_PATH = "/"

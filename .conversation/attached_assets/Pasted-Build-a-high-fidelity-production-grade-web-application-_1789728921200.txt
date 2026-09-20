@@ -1,0 +1,27 @@
+Build a high-fidelity, production-grade web application prototype named "Kabadiwala Connect" (Digital Circular-Economy & Waste Management Platform).
+
+CRITICAL REQUIREMENT 1: Do NOT display any watermarks, branding, badges, or text mentioning "Bolt", "StackBlitz", or any external platform anywhere in the app, footers, headers, or floating elements. It must look completely like an independent, professional SaaS platform.
+
+CRITICAL REQUIREMENT 2 (ANTI-AI DESIGN AESTHETIC): Ensure the UI does NOT look like a generic AI-generated template. Avoid overused purple/indigo gradients, abstract floating background blobs, excessive glassmorphism, and repetitive pill-shaped badges. Instead, style it like a meticulously engineered, premium human-designed enterprise SaaS product (reminiscent of Linear, Stripe, or modern logistics tools like Flexport). Use crisp rectangular or slightly rounded containers (rounded-lg / rounded-xl), clean subtle borders (border border-slate-200), intentional whitespace, sharp typographic hierarchy, and solid, confident accent colors.
+
+ARCHITECTURE & MOCK NOTE: Use smart frontend mocks, React state management, and browser localStorage so that actions taken in one view (e.g., booking a pickup as a household) instantly persist and update across portals (e.g., showing up live on the collector dashboard).
+
+Include a clear role switcher in the navigation to seamlessly toggle between three core modules:
+
+1. Household / Citizen Portal (Selling Scrap):
+   - Clean, data-structured card layout to select scrap categories (Newspapers, Cardboard, Plastic Bottles, E-Waste, Scrap Iron) and input estimated weights.
+   - Automatic browser Geolocation capture so households can pin their location or detect their address dynamically.
+   - A dynamic real-time price calculator showing estimated cash payouts based on standard market rates.
+   - A "Schedule Pickup" button that creates a tracking ticket and logs the address/location.
+
+2. Collector / Kabadiwala Partner Portal (RADICALLY SIMPLIFIED, LOW-LITERACY UI):
+   - Designed specifically for non-tech-savvy field workers: Huge touch targets, high-contrast bold fonts, and minimal clutter.
+   - A clean list of nearby pickup requests displaying *only* clear location data (distance, neighborhood landmark, address snippet), material type, and cash payout in massive, bold numbers.
+   - A massive, high-contrast primary "ACCEPT JOB" button.
+   - Once accepted, a streamlined screen featuring a big "I HAVE ARRIVED" button and a simple numeric keypad interface to enter the final verified weight and trigger an instant wallet cash-out simulation.
+
+3. Green Impact & Municipal ESG Dashboard:
+   - Macro-level analytics for corporate partners and municipal bodies: Total kilograms of waste diverted from landfills, equivalent trees saved, carbon footprint reduction score, and total unorganized labor earnings formalized.
+
+COLOR SYSTEM:
+- Professional eco-logistics palette: Deep forest green (`#047857` / emerald-700) for primary actions, clean neutral slate backgrounds (`slate-50`), dark slate text (`slate-900`), and high-contrast status colors.
