@@ -3,7 +3,7 @@ export type AppView = 'login' | 'household' | 'collector' | 'impact';
 export type HouseholdTab = 'schedule' | 'tracking' | 'history' | 'safety' | 'prices';
 export type CollectorTab = 'queue' | 'active' | 'lots' | 'prices' | 'recyclers' | 'handover' | 'earnings' | 'safety';
 
-export type Language = 'en' | 'hi' | 'mr';
+export type Language = 'en' | 'hi' | 'bn' | 'mr';
 
 export type PickupStatus = 'pending' | 'accepted' | 'arrived' | 'completed' | 'cancelled';
 export type UrgencyLevel = 'urgent' | 'express' | 'standard';
@@ -25,7 +25,8 @@ export interface MaterialLine {
   key: MaterialKey;
   label: string;
   labelHi: string;
-  labelMr: string;
+  labelBn?: string;
+  labelMr?: string;
   short: string;
   rate: number; // in INR per kg
   kg: number;
@@ -33,7 +34,8 @@ export interface MaterialLine {
   category: 'ewaste' | 'metal' | 'battery' | 'display' | 'plastic' | 'paper';
   description: string;
   descriptionHi: string;
-  descriptionMr: string;
+  descriptionBn?: string;
+  descriptionMr?: string;
   marketRange: string;
   trend: 'up' | 'down' | 'stable';
   trendPercent: string;
@@ -167,19 +169,24 @@ export interface SafetyGuideItem {
   id: string;
   title: string;
   titleHi: string;
-  titleMr: string;
+  titleBn?: string;
+  titleMr?: string;
   dangerDescription: string;
   dangerDescriptionHi: string;
-  dangerDescriptionMr: string;
+  dangerDescriptionBn?: string;
+  dangerDescriptionMr?: string;
   safePractice: string;
   safePracticeHi: string;
-  safePracticeMr: string;
+  safePracticeBn?: string;
+  safePracticeMr?: string;
   economicBenefit: string;
   economicBenefitHi: string;
-  economicBenefitMr: string;
+  economicBenefitBn?: string;
+  economicBenefitMr?: string;
   audioSpeechText: string;
   audioSpeechTextHi: string;
-  audioSpeechTextMr: string;
+  audioSpeechTextBn?: string;
+  audioSpeechTextMr?: string;
   iconName: 'Flame' | 'FlaskConical' | 'BatteryCharging' | 'Tv2' | 'ShieldAlert';
   severity: 'critical' | 'high' | 'warning';
 }

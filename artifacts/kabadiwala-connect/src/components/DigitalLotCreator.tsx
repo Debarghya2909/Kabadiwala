@@ -50,6 +50,7 @@ export const DigitalLotCreator: React.FC<DigitalLotCreatorProps> = ({
     authUser.zone || 'Kasba Aggregation Hub, Kolkata'
   );
   const [notes, setNotes] = useState<string>('Segregated e-waste collection ready for certified hub handover.');
+  const [lotSuccess, setLotSuccess] = useState<DigitalLot | null>(null);
 
   const selectedMaterial = materialCatalog.find((m) => m.key === category) || materialCatalog[0];
   const estimatedLotValue = Math.round((approxWeight || 0) * selectedMaterial.rate);
@@ -80,13 +81,7 @@ export const DigitalLotCreator: React.FC<DigitalLotCreatorProps> = ({
 
     const nextLots = [newLot, ...lots];
     onSaveLots(nextLots);
-    alert(
-      language === 'hi'
-        ? `डिजिटल लॉट ${newLot.id} सफलतापूर्वक बनाया गया! अनुमानित मूल्य: ${formatINR(newLot.estimatedValue)}`
-        : language === 'mr'
-        ? `डिजिटल लॉट ${newLot.id} तयार झाला! अंदाजे मूल्य: ${formatINR(newLot.estimatedValue)}`
-        : `Digital Lot ${newLot.id} created successfully! Estimated value: ${formatINR(newLot.estimatedValue)}`
-    );
+    setLotSuccess(newLot);
   };
 
   const handleDeleteLot = (lotId: string) => {
@@ -105,6 +100,8 @@ export const DigitalLotCreator: React.FC<DigitalLotCreatorProps> = ({
         <h2 className="mt-1 text-xl font-bold text-slate-900 sm:text-2xl">
           {language === 'hi'
             ? 'नया ई-कचरा डिजिटल लॉट बनाएं'
+            : language === 'bn'
+            ? 'নতুন ই-বর্জ্য ডিজিটাল লট তৈরি করুন'
             : language === 'mr'
             ? 'नवीन ई-कचरा डिजिटल लॉट तयार करा'
             : 'Create Digital Scrap & E-Waste Lot'}
@@ -112,10 +109,41 @@ export const DigitalLotCreator: React.FC<DigitalLotCreatorProps> = ({
         <p className="mt-1 text-xs text-slate-600 sm:text-sm">
           {language === 'hi'
             ? 'अपनी एकत्रित सामग्री का फोटो लें, वजन दर्ज करें और तुरंत सर्वोत्तम रीसाइक्लर से मिलान पाएं।'
+            : language === 'bn'
+            ? 'আপনার সংগৃহীত সামগ্রীর ছবি তুলুন, ওজন লিখুন এবং অনুমোদিত রিসাইক্লারের কাছ থেকে তাৎক্ষণিক মূল্য পান।'
             : language === 'mr'
             ? 'गोळा केलेल्या साहित्याचा फोटो घ्या, वजन टाका आणि तात्काळ सर्वोत्तम रीसायकलर्स मिळवा.'
             : 'Aggregate collected materials into digital lots with verified photos and instant EPR valuation.'}
         </p>
+
+        {lotSuccess && (
+          <div className="mt-4 rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-emerald-950 flex items-start justify-between gap-3">
+            <div className="flex items-start gap-2.5">
+              <CheckCircle2 className="h-5 w-5 text-emerald-700 shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs font-bold">
+                  {language === 'hi'
+                    ? `डिजिटल लॉट ${lotSuccess.id} सफलतापूर्वक बनाया गया!`
+                    : language === 'bn'
+                    ? `ডিজিটাল লট ${lotSuccess.id} সফলভাবে তৈরি হয়েছে!`
+                    : language === 'mr'
+                    ? `डिजिटल लॉट ${lotSuccess.id} तयार झाला!`
+                    : `Digital Lot ${lotSuccess.id} created successfully!`}
+                </p>
+                <p className="text-xs text-emerald-800 mt-0.5">
+                  {lotSuccess.approxWeightKg} kg · Estimated Value: {formatINR(lotSuccess.estimatedValue)}
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setLotSuccess(null)}
+              className="text-xs font-bold text-emerald-700 hover:text-emerald-900"
+            >
+              ✕
+            </button>
+          </div>
+        )}
 
         <form onSubmit={handleCreateLot} className="mt-6 space-y-5">
           {/* Material Category Selector */}

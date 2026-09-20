@@ -44,6 +44,9 @@ export const PriceBoard: React.FC<PriceBoardProps> = ({ language }) => {
     if (language === 'hi') {
       spokenText =
         'आज के प्रमुख ई-कचरा व स्क्रैप भाव: सर्किट बोर्ड 285 रुपये किलो. तांबे की केबल 220 रुपये किलो. बैटरियां 95 रुपये किलो. मोटर्स 58 रुपये किलो. एलसीडी पैनल 52 रुपये किलो. लोहा 34 रुपये किलो. गत्ता 14 रुपये किलो.';
+    } else if (language === 'bn') {
+      spokenText =
+        'আজকের প্রধান ই-বর্জ্য ও স্ক্র্যাপের বাজারদর: সার্কিট বোর্ড প্রতি কেজি ২৮৫ টাকা, তামার তার প্রতি কেজি ২২০ টাকা, ব্যাটারি প্রতি কেজি ৯৫ টাকা, মোটর প্রতি কেজি ৫৮ টাকা, এলসিডি প্যানেল প্রতি কেজি ৫২ টাকা, লোহা প্রতি কেজি ৩৪ টাকা, কার্টন ও পিচবোর্ড প্রতি কেজি ১৪ টাকা।';
     } else if (language === 'mr') {
       spokenText =
         'आजचे प्रमुख ई-कचरा व भंगार दर: सर्किट बोर्ड 285 रुपये किलो. तांब्याची केबल 220 रुपये किलो. बॅटरी 95 रुपये किलो. इलेक्ट्रिक मोटर्स 58 रुपये किलो. एलसीडी पॅनेल्स 52 रुपये किलो. लोखंड 34 रुपये किलो. पुठ्ठा 14 रुपये किलो.';
@@ -134,9 +137,21 @@ export const PriceBoard: React.FC<PriceBoardProps> = ({ language }) => {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {filteredMaterials.map((mat) => {
           const label =
-            language === 'hi' ? mat.labelHi : language === 'mr' ? mat.labelMr : mat.label;
+            language === 'hi'
+              ? mat.labelHi
+              : language === 'bn'
+              ? (mat.labelBn || mat.label)
+              : language === 'mr'
+              ? (mat.labelMr || mat.label)
+              : mat.label;
           const desc =
-            language === 'hi' ? mat.descriptionHi : language === 'mr' ? mat.descriptionMr : mat.description;
+            language === 'hi'
+              ? mat.descriptionHi
+              : language === 'bn'
+              ? (mat.descriptionBn || mat.description)
+              : language === 'mr'
+              ? (mat.descriptionMr || mat.description)
+              : mat.description;
 
           return (
             <div

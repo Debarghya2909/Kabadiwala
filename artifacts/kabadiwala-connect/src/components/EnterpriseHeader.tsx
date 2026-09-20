@@ -76,16 +76,16 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({
                 <span className="hidden text-[11px] font-medium text-slate-500 md:inline">
                   {language === 'hi'
                     ? 'औपचारिक ई-कचरा व रीसाइक्लिंग नेटवर्क'
-                    : language === 'mr'
-                    ? 'अधिकृत ई-कचरा व पुनर्चक्रीकरण प्रणाली'
+                    : language === 'bn'
+                    ? 'আনুষ্ঠানিক ই-বর্জ্য ও স্ক্র্যাপ রিসাইক্লিং নেটওয়ার্ক'
                     : 'Formal E-Waste & Scrap Recycling Network'}
                 </span>
               </div>
               <div className="text-[11px] font-medium text-emerald-700 md:hidden">
                 {language === 'hi'
                   ? 'अधिकृत रीसाइक्लिंग नेटवर्क'
-                  : language === 'mr'
-                  ? 'अधिकृत पुनर्चक्रीकरण प्रणाली'
+                  : language === 'bn'
+                  ? 'অনুমোদিত রিসাইক্লিং নেটওয়ার্ক'
                   : 'Formal Recycling Network'}
               </div>
             </div>
@@ -198,7 +198,7 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({
             <div className="hidden items-center pl-2 pr-1 text-slate-500 sm:flex">
               <Globe className="h-3.5 w-3.5" />
             </div>
-            {(['en', 'hi', 'mr'] as Language[]).map((lang) => {
+            {(['en', 'hi', 'bn'] as Language[]).map((lang) => {
               const isActive = language === lang;
               return (
                 <button
@@ -230,13 +230,13 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({
                   {authUser.role === 'collector'
                     ? language === 'hi'
                       ? 'कबाड़ीवाला साथी'
-                      : language === 'mr'
-                      ? 'कबाडी भागीदार'
+                      : language === 'bn'
+                      ? 'কবাডিওয়ালা সাথী'
                       : 'Collector Partner'
                     : language === 'hi'
                     ? 'नागरिक खाता'
-                    : language === 'mr'
-                    ? 'नागरिक खाते'
+                    : language === 'bn'
+                    ? 'নাগরিক অ্যাকাউন্ট'
                     : 'Household Citizen'}
                 </div>
               </div>
@@ -250,7 +250,7 @@ export const EnterpriseHeader: React.FC<EnterpriseHeaderProps> = ({
               >
                 <LogOut className="h-3.5 w-3.5 text-slate-500" />
                 <span className="hidden sm:inline">
-                  {language === 'hi' ? 'लॉग आउट' : language === 'mr' ? 'लॉग आउट' : 'Sign Out'}
+                  {language === 'hi' ? 'लॉग आउट' : language === 'bn' ? 'লগ আউট' : 'Sign Out'}
                 </span>
               </button>
             </div>

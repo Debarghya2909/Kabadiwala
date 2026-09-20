@@ -90,6 +90,7 @@ export const HouseholdPortal: React.FC<HouseholdPortalProps> = ({
   const [slot, setSlot] = useState('⚡ Urgent · Next 45 Mins (Priority)');
   const [notes, setNotes] = useState('');
   const [bookingSuccessId, setBookingSuccessId] = useState<string | null>(null);
+  const [bookingError, setBookingError] = useState<string | null>(null);
 
   // POST-PICKUP COLLECTOR RATING STATE
   const [ratingStars, setRatingStars] = useState<number>(5);
@@ -141,10 +142,31 @@ export const HouseholdPortal: React.FC<HouseholdPortalProps> = ({
 
   const handleBookingSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (totalKg <= 0) {
-      alert('Please select at least one material with weight greater than 0 kg.');
+    if (!address.trim() || address.trim().length < 5) {
+      setBookingError(
+        language === 'hi'
+          ? 'कृपया पूरा पता दर्ज करें।'
+          : language === 'bn'
+          ? 'অনুগ্রহ করে সম্পূর্ণ রাস্তার ঠিকানা লিখুন।'
+          : language === 'mr'
+          ? 'कृपया पूर्ण पत्ता प्रविष्ट करा.'
+          : 'Please enter a valid street address for doorstep pickup.'
+      );
       return;
     }
+    if (totalKg <= 0) {
+      setBookingError(
+        language === 'hi'
+          ? 'कृपया कम से कम एक सामग्री का 0 किग्रा से अधिक वजन चुनें।'
+          : language === 'bn'
+          ? 'অনুগ্রহ করে অন্তত একটি সামগ্রীর ০ কেজির বেশি ওজন নির্বাচন করুন।'
+          : language === 'mr'
+          ? 'कृपया किमान एका साहित्याचे 0 किलोपेक्षा जास्त वजन निवडा.'
+          : 'Please select at least one material with weight greater than 0 kg.'
+      );
+      return;
+    }
+    setBookingError(null);
 
     const newPickupId = `KC-${Math.floor(1000 + Math.random() * 9000)}`;
     const newOtp = Math.floor(1000 + Math.random() * 9000).toString();
@@ -323,7 +345,13 @@ export const HouseholdPortal: React.FC<HouseholdPortalProps> = ({
                 {materialCatalog.map((mat) => {
                   const currentKg = selectedWeights[mat.key] || 0;
                   const label =
-                    language === 'hi' ? mat.labelHi : language === 'mr' ? mat.labelMr : mat.label;
+                    language === 'hi'
+                      ? mat.labelHi
+                      : language === 'bn'
+                      ? (mat.labelBn || mat.label)
+                      : language === 'mr'
+                      ? mat.labelMr
+                      : mat.label;
                   const isSelected = currentKg > 0;
 
                   return (
@@ -440,6 +468,13 @@ export const HouseholdPortal: React.FC<HouseholdPortalProps> = ({
                     </span>
                   </div>
                 </div>
+
+                {bookingError && (
+                  <div className="rounded-lg border border-red-300 bg-red-50 p-2.5 text-xs text-red-800 flex items-center gap-2">
+                    <AlertCircle className="h-4 w-4 text-red-600 shrink-0" />
+                    <span>{bookingError}</span>
+                  </div>
+                )}
 
                 <button
                   id="confirm-booking-btn"

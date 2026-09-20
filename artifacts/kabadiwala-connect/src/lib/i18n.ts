@@ -5,6 +5,7 @@ export const LANGUAGE_STORAGE_KEY = 'kabadiwala_preferred_language';
 export const languageNames: Record<Language, { label: string; native: string }> = {
   en: { label: 'English', native: 'English' },
   hi: { label: 'Hindi', native: 'हिन्दी' },
+  bn: { label: 'Bengali', native: 'বাংলা' },
   mr: { label: 'Marathi', native: 'मराठी' },
 };
 
@@ -270,6 +271,93 @@ export const translations = {
     express: 'आजचे पिकअप',
     standard: 'नियोजित',
   },
+  bn: {
+    appTitle: 'কবাডিওয়ালা কানেক্ট',
+    appSubtitle: 'ই-বর্জ্য ও স্ক্র্যাপ পুনর্ব্যবহার নেটওয়ার্ক',
+    tagline: 'ইপিআর (EPR) বিধিমালার অধীনে অনানুষ্ঠানিক বর্জ্য সংগ্রাহকদের সরাসরি অনুমোদিত রিসাইকলারদের সাথে যুক্ত করা।',
+    signOut: 'লগ আউট',
+    citizenPortal: 'নাগরিক / গৃহস্থালি পোর্টাল',
+    collectorPortal: 'কবাডিওয়ালা সাথী / ফিল্ড পার্টনার',
+    language: 'ভাষা',
+
+    // Collector Tabs
+    tabQueue: 'পিকআপ তালিকা',
+    tabActive: 'ডিজিটাল ওজন ও তৌল',
+    tabLots: 'ডিজিটাল লট তৈরি',
+    tabPrices: 'দৈনিক বাজারদর ফলক',
+    tabRecyclers: 'অনুমোদিত রিসাইকলার',
+    tabHandover: 'হস্তান্তর ও খতিয়ান',
+    tabSafety: 'নিরাপত্তা নির্দেশিকা',
+    tabImpact: 'পৌর ও ইএসজি প্রভাব',
+    backToPortal: 'পোর্টালে ফিরে যান',
+    offlineSyncOnline: 'ফিল্ড সিঙ্ক: অনলাইন',
+    offlineSyncOffline: 'ফিল্ড সিঙ্ক: অফলাইন (লোকাল)',
+    listenScale: 'ওজন বিবরণ শুনুন',
+
+    // Household Tabs
+    tabSchedule: 'স্ক্র্যাপ বুক করুন',
+    tabTracking: 'লাইভ ট্র্যাকিং',
+    tabHistory: 'অর্ডার ইতিহাস',
+
+    // Scale Calculator
+    scaleTitle: 'আইটেমভিত্তিক ডিজিটাল স্কেল ক্যালকুলেটর',
+    scaleSubtitle: 'প্রতিটি সামগ্রীর সঠিক স্কেল ওজন লিখুন। নগদ পাওনা স্বয়ংক্রিয়ভাবে হিসাব হবে।',
+    verifiedKg: 'যাচাইকৃত ওজন (কেজি)',
+    ratePerKg: 'দর (₹/কেজি)',
+    subtotal: 'উপমোট',
+    totalCalculatedPayout: 'মোট প্রদেয় নগদ অর্থ',
+    confirmAndCash: 'ওজন নিশ্চিত করুন ও নগদ টাকা দিন',
+    residentOtp: 'নাগরিকের ৪-সংখ্যার সিকিউরিটি পিন',
+    addMaterialRow: '+ অতিরিক্ত সামগ্রী যোগ করুন',
+
+    // Handover & Ledger
+    handoverTitle: 'ডিজিটাল হস্তান্তর রশিদ',
+    handoverSubtitle: 'অনুমোদিত রিসাইকলারে ই-বর্জ্য হস্তান্তরের ডিজিটাল প্রমাণপত্র।',
+    referenceCode: 'রেফারেন্স কোড',
+    recyclerName: 'অনুমোদিত রিসাইকলার',
+    handoverCash: 'নগদ হস্তান্তর',
+    handoverDigital: 'ডিজিটাল / ইউপিআই',
+    statusConfirmed: 'রিসাইকলার দ্বারা নিশ্চিত',
+    earningsLedger: 'উপার্জন ও জমাখরচের খতিয়ান',
+    totalCashReceived: 'আজ সংগৃহীত নগদ টাকা',
+    totalRecyclerPayout: 'রিসাইকলার থেকে প্রাপ্ত অর্থ',
+    netProfitMargin: 'নিট লাভের মার্জিন',
+
+    // Safety Guidance
+    safetyTitle: 'মাঠ পর্যায়ের নিরাপত্তা ও ক্ষতিকর উপাদান নির্দেশিকা',
+    safetySubtitle: 'নিজের স্বাস্থ্য রক্ষা করুন, বিষাক্ত ধোঁয়া থেকে দূরে থাকুন এবং অনুমোদিত রিসাইকলারে সর্বোচ্চ দাম পান।',
+    hazardousPractice: 'বিপজ্জনক খোলা পদ্ধতি',
+    safeAlternative: 'অনুমোদিত নিরাপদ পদ্ধতি',
+    economicValue: 'অর্থনৈতিক লাভ (মুনাফা)',
+    listenAudio: 'নিরাপত্তা অডিও শুনুন',
+    stopAudio: 'অডিও বন্ধ করুন',
+
+    // Price Board
+    priceBoardTitle: 'অফিসিয়াল ই-বর্জ্য ও স্ক্র্যাপ বাজারদর ফলক',
+    priceBoardSubtitle: 'ইপিআর বিধিমালা অনুযায়ী স্বচ্ছ ও নিশ্চিত দৈনিক বাজারদর।',
+    currentRate: 'বর্তমান দর',
+    fairMarketRange: 'ন্যায্য বাজার দর',
+    trend: 'বাজারের গতিপ্রকৃতি',
+    listenPrices: 'আজকের বাজারদর শুনুন',
+
+    // Ratings
+    rateCollectorTitle: 'আপনার সংগ্রহকারী সঙ্গীর মূল্যায়ন করুন',
+    rateCollectorSubtitle: 'আপনার রেটিং অনানুষ্ঠানিক সংগ্রহকারীদের প্রাতিষ্ঠানিক নেটওয়ার্কে আস্থা বৃদ্ধি করতে সাহায্য করে।',
+    submitRating: 'রেটিং জমা দিন',
+    ratingSubmitted: 'ধন্যবাদ! আপনার রেটিং সফলভাবে সংরক্ষিত হয়েছে।',
+    tagPunctual: 'সময়নিষ্ঠ ও তৎপর',
+    tagFairWeighing: 'সঠিক ও নিখুঁত স্কেল ওজন',
+    tagPolite: 'বিনম্র ও পেশাদার',
+    tagCashImmediate: 'তাত্ক্ষণিক নগদ পরিশোধ',
+    tagCleanHandling: 'পরিচ্ছন্ন ও নিরাপদ হ্যান্ডলিং',
+
+    // Common
+    kg: 'কেজি',
+    rs: '₹',
+    urgent: 'জরুরি (৪৫ মি.)',
+    express: 'আজকের ডেলিভারি',
+    standard: 'সাধারণ শিডিউল',
+  },
 };
 
 export function getTranslation(lang: Language = 'en') {
@@ -287,6 +375,8 @@ export function speakVernacular(text: string, lang: Language = 'en') {
     const utterance = new SpeechSynthesisUtterance(text);
     if (lang === 'hi') {
       utterance.lang = 'hi-IN';
+    } else if (lang === 'bn') {
+      utterance.lang = 'bn-IN';
     } else if (lang === 'mr') {
       utterance.lang = 'mr-IN';
     } else {

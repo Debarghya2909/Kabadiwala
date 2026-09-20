@@ -36,7 +36,8 @@ export const SafetyModule: React.FC<SafetyModuleProps> = ({ language }) => {
 
     let textToSpeak = guide.audioSpeechText;
     if (language === 'hi') textToSpeak = guide.audioSpeechTextHi;
-    if (language === 'mr') textToSpeak = guide.audioSpeechTextMr;
+    if (language === 'bn') textToSpeak = guide.audioSpeechTextBn || guide.audioSpeechText;
+    if (language === 'mr') textToSpeak = guide.audioSpeechTextMr || guide.audioSpeechText;
 
     const started = speakVernacular(textToSpeak, language);
     if (!started) {
@@ -94,22 +95,28 @@ export const SafetyModule: React.FC<SafetyModuleProps> = ({ language }) => {
         {safetyGuides.map((guide) => {
           const isPlaying = playingId === guide.id;
           const title =
-            language === 'hi' ? guide.titleHi : language === 'mr' ? guide.titleMr : guide.title;
+            language === 'hi' ? guide.titleHi : language === 'bn' ? (guide.titleBn || guide.title) : language === 'mr' ? guide.titleMr : guide.title;
           const danger =
             language === 'hi'
               ? guide.dangerDescriptionHi
+              : language === 'bn'
+              ? (guide.dangerDescriptionBn || guide.dangerDescription)
               : language === 'mr'
               ? guide.dangerDescriptionMr
               : guide.dangerDescription;
           const safe =
             language === 'hi'
               ? guide.safePracticeHi
+              : language === 'bn'
+              ? (guide.safePracticeBn || guide.safePractice)
               : language === 'mr'
               ? guide.safePracticeMr
               : guide.safePractice;
           const economic =
             language === 'hi'
               ? guide.economicBenefitHi
+              : language === 'bn'
+              ? (guide.economicBenefitBn || guide.economicBenefit)
               : language === 'mr'
               ? guide.economicBenefitMr
               : guide.economicBenefit;

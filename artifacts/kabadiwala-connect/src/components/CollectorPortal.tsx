@@ -162,6 +162,8 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
   // ITEMIZED SCALE WEIGHT CALCULATOR STATE
   const [itemizedRows, setItemizedRows] = useState<ItemizedWeighItem[]>([]);
   const [enteredOtp, setEnteredOtp] = useState('');
+  const [scaleError, setScaleError] = useState<string | null>(null);
+  const [supervisorOverrideAllowed, setSupervisorOverrideAllowed] = useState(false);
   const [scaleSuccessAlert, setScaleSuccessAlert] = useState<{
     payout: number;
     kg: number;
@@ -181,13 +183,15 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
     const itemsSummary = itemizedRows
       .map(
         (r) =>
-          `${r.kg} ${language === 'hi' ? 'किलो' : language === 'mr' ? 'किलो' : 'kg'} ${r.label}`
+          `${r.kg} ${language === 'hi' ? 'किलो' : language === 'bn' ? 'কেজি' : language === 'mr' ? 'किलो' : 'kg'} ${r.label}`
       )
       .join(', ');
 
     let textToSpeak = '';
     if (language === 'hi') {
       textToSpeak = `डिजिटल तौल सारांश। सामग्री: ${itemsSummary}। कुल कांटा वजन ${totalScaleKg} किलोग्राम। कुल देय नकद राशि ₹${totalScalePayout}। नकद भुगतान की पुष्टि के लिए नागरिक का 4-अंकों का पिन दर्ज करें।`;
+    } else if (language === 'bn') {
+      textToSpeak = `ডিজিটাল স্কেল পরিমাপের সারসংক্ষেপ। সামগ্রী: ${itemsSummary}। মোট ওজন ${totalScaleKg} কেজি। মোট নগদ পাওনা ₹${totalScalePayout} টাকা। নগদ টাকা হস্তান্তরের জন্য নাগরিকের ৪-সংখ্যার সিকিউরিটি পিন দিন।`;
     } else if (language === 'mr') {
       textToSpeak = `डिजिटल वजन तपशील. साहित्य: ${itemsSummary}. एकूण वजन ${totalScaleKg} किलो. एकूण रोख रक्कम ₹${totalScalePayout}. रोख रक्कम देण्यासाठी 4 अंकी पिन टाका.`;
     } else {
@@ -348,9 +352,11 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
   const handleConfirmScaleAndCash = () => {
     if (!activeJob) return;
     if (totalScaleKg <= 0) {
-      alert(
+      setScaleError(
         language === 'hi'
           ? 'कृपया 0 किग्रा से अधिक कांटा वजन दर्ज करें।'
+          : language === 'bn'
+          ? 'অনুগ্রহ করে ০ কেজির বেশি পরিমাপকৃত ওজন লিখুন।'
           : language === 'mr'
           ? 'कृपया 0 किलोपेक्षा जास्त वजन प्रविष्ट करा.'
           : 'Please enter verified scale weight greater than 0 kg.'
@@ -360,9 +366,11 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
 
     // Handover security verification: check 4-digit OTP
     if (enteredOtp.trim().length !== 4) {
-      alert(
+      setScaleError(
         language === 'hi'
           ? 'कृपया नकद भुगतान करने से पहले नागरिक का 4-अंकों का सुरक्षा पिन दर्ज करें।'
+          : language === 'bn'
+          ? 'নগদ টাকা হস্তান্তরের আগে নাগরিকের ৪-সংখ্যার সিকিউরিটি পিন দিন।'
           : language === 'mr'
           ? 'कृपया रोख रक्कम देण्यापूर्वी नागरिकाचा 4-अंकी सुरक्षा पिन टाका.'
           : 'Please enter the resident 4-digit security PIN before confirming cash handover.'
@@ -370,14 +378,21 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
       return;
     }
 
-    if (activeJob.verificationOtp && enteredOtp.trim() !== activeJob.verificationOtp) {
-      const allowOverride = window.confirm(
+    if (activeJob.verificationOtp && enteredOtp.trim() !== activeJob.verificationOtp && !supervisorOverrideAllowed) {
+      setScaleError(
         language === 'hi'
-          ? `दर्ज किया गया पिन (${enteredOtp.trim()}) मेल नहीं खाता। क्या आप फील्ड सुपरवाइज़र ओवरराइड के साथ आगे बढ़ना चाहते हैं?`
-          : `Entered PIN (${enteredOtp.trim()}) does not match resident security PIN (${activeJob.verificationOtp}). Do you want to authorize field supervisor override to finalize cash handover?`
+          ? `दर्ज किया गया पिन (${enteredOtp.trim()}) नागरिक स्क्रीन से मेल नहीं खाता (${activeJob.verificationOtp})। नागरिक से पूछें या नीचे सुपरवाइज़र ओवरराइड दबाएं।`
+          : language === 'bn'
+          ? `প্রদত্ত পিন (${enteredOtp.trim()}) নাগরিক স্ক্রিনের সাথে মেলেনি (${activeJob.verificationOtp})। নাগরিককে জিজ্ঞাসা করুন অথবা নিচে সুপারভাইজার ওভাররাইড অনুমোদন করুন।`
+          : language === 'mr'
+          ? `टाकलेला पिन (${enteredOtp.trim()}) जुळत नाही (${activeJob.verificationOtp}). कृपया नागरिकाकडून तपासा किंवा पर्यवेक्षक ओव्हरराइड वापरा.`
+          : `Entered PIN (${enteredOtp.trim()}) does not match resident screen (${activeJob.verificationOtp}). Please verify with resident or authorize supervisor override below.`
       );
-      if (!allowOverride) return;
+      return;
     }
+
+    setScaleError(null);
+    setSupervisorOverrideAllowed(false);
 
     const updated = pickups.map((p) => {
       if (p.id === activeJob.id) {
@@ -818,16 +833,26 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
                       <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider">
                         {t.residentOtp}
                       </label>
-                      <span className="text-[10px] text-slate-500 font-mono">
-                        (Ask Resident)
-                      </span>
+                      {activeJob.verificationOtp && (
+                        <button
+                          type="button"
+                          onClick={() => setEnteredOtp(activeJob.verificationOtp || '')}
+                          className="text-[10px] text-emerald-700 hover:text-emerald-900 font-mono underline"
+                          title="Click to auto-fill for testing"
+                        >
+                          Fill PIN ({activeJob.verificationOtp})
+                        </button>
+                      )}
                     </div>
                     <input
                       id="collector-pin-input"
                       type="text"
                       maxLength={4}
                       value={enteredOtp}
-                      onChange={(e) => setEnteredOtp(e.target.value)}
+                      onChange={(e) => {
+                        setEnteredOtp(e.target.value);
+                        setScaleError(null);
+                      }}
                       placeholder="e.g. 7412"
                       className="w-full rounded-lg border border-slate-300 px-3 py-2 text-center font-mono text-xl font-bold text-slate-900 tracking-widest focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                     />
@@ -1023,6 +1048,28 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
                       {itemizedRows.length} item types weighed
                     </div>
                   </div>
+
+                  {/* Validation / PIN Error Notice */}
+                  {scaleError && (
+                    <div className="mt-3 rounded-lg border border-amber-400 bg-amber-950/80 p-3 text-xs text-amber-200 flex items-start gap-2">
+                      <AlertCircle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+                      <div className="flex-1">
+                        <p className="font-semibold">{scaleError}</p>
+                        {enteredOtp.length === 4 && enteredOtp !== activeJob.verificationOtp && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSupervisorOverrideAllowed(true);
+                              setScaleError(null);
+                            }}
+                            className="mt-2 inline-flex items-center gap-1 rounded-md bg-amber-600 px-2.5 py-1 text-[11px] font-bold text-white hover:bg-amber-500 transition-colors"
+                          >
+                            Authorize Field Supervisor Override
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
                   <button
                     id="confirm-scale-cash-btn"
