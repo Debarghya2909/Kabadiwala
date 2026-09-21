@@ -23,13 +23,12 @@ import {
   Layers,
   Building2,
   Receipt,
-  ShieldAlert,
   TrendingUp,
   Banknote,
   ChevronRight,
-  Info,
   Volume2,
   VolumeX,
+  Navigation,
 } from 'lucide-react';
 import {
   Pickup,
@@ -49,13 +48,11 @@ import {
   formatDateShort,
   deriveArea,
   deriveUrgency,
-  getCalculatedPayoutEstimate,
   materialCatalog,
   readDigitalLotsFromStorage,
   saveDigitalLotsToStorage,
   readHandoversFromStorage,
   saveHandoversToStorage,
-  authorizedRecyclers,
 } from '../data/mockData';
 import { getTranslation, speakVernacular, stopVernacularSpeech } from '../lib/i18n';
 import { SafetyModule } from './SafetyModule';
@@ -63,6 +60,7 @@ import { PriceBoard } from './PriceBoard';
 import { RecyclerDirectory } from './RecyclerDirectory';
 import { DigitalLotCreator } from './DigitalLotCreator';
 import { HandoverLedger } from './HandoverLedger';
+import { CardboardBoxIcon, PlasticBottleIcon, EwastePhoneIcon } from './Illustrations';
 
 interface CollectorPortalProps {
   pickups: Pickup[];
@@ -71,7 +69,6 @@ interface CollectorPortalProps {
   tab: CollectorTab;
   onSelectTab: (tab: CollectorTab) => void;
   language: Language;
-  onSwitchToHousehold?: () => void;
 }
 
 export const CollectorPortal: React.FC<CollectorPortalProps> = ({
@@ -115,18 +112,6 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
   // Search & Filter state for Queue
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedArea, setSelectedArea] = useState('all');
-  const [selectedWeightType, setSelectedWeightType] = useState<WeightTier>('all');
-  const [selectedUrgency, setSelectedUrgency] = useState('all');
-
-  // Distinct areas from open pending jobs
-  const distinctAreas = useMemo(() => {
-    const set = new Set<string>();
-    openJobs.forEach((job) => {
-      const area = job.area || deriveArea(job.address);
-      if (area) set.add(area);
-    });
-    return Array.from(set).sort();
-  }, [openJobs]);
 
   // Filtered jobs in queue
   const filteredJobs = useMemo(() => {
@@ -134,32 +119,19 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
         const matchesAddress = job.address.toLowerCase().includes(q);
-        const matchesLandmark = (job.landmark || '').toLowerCase().includes(q);
         const matchesUser = job.userName.toLowerCase().includes(q);
-        const matchesNotes = (job.notes || '').toLowerCase().includes(q);
-        if (!matchesAddress && !matchesLandmark && !matchesUser && !matchesNotes) {
-          return false;
-        }
+        const matchesId = job.id.toLowerCase().includes(q);
+        if (!matchesAddress && !matchesUser && !matchesId) return false;
       }
       if (selectedArea !== 'all') {
         const area = job.area || deriveArea(job.address);
         if (area !== selectedArea) return false;
       }
-      if (selectedWeightType !== 'all') {
-        const kg = job.estimatedKg;
-        if (selectedWeightType === 'light' && kg > 10) return false;
-        if (selectedWeightType === 'medium' && (kg <= 10 || kg > 25)) return false;
-        if (selectedWeightType === 'heavy' && kg <= 25) return false;
-      }
-      if (selectedUrgency !== 'all') {
-        const urgency = job.urgency || deriveUrgency(job.slot);
-        if (urgency !== selectedUrgency) return false;
-      }
       return true;
     });
-  }, [openJobs, searchQuery, selectedArea, selectedWeightType, selectedUrgency]);
+  }, [openJobs, searchQuery, selectedArea]);
 
-  // ITEMIZED SCALE WEIGHT CALCULATOR STATE
+  // Itemized scale weight calculator state
   const [itemizedRows, setItemizedRows] = useState<ItemizedWeighItem[]>([]);
   const [enteredOtp, setEnteredOtp] = useState('');
   const [scaleError, setScaleError] = useState<string | null>(null);
@@ -172,7 +144,7 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
 
   const [isSpeakingScale, setIsSpeakingScale] = useState(false);
 
-  // Text-To-Speech audio readout for scale weighing calculator (low-literacy accessible)
+  // Text-To-Speech audio readout for scale weighing calculator
   const handleSpeakScaleReadout = () => {
     if (isSpeakingScale) {
       stopVernacularSpeech();
@@ -181,29 +153,15 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
     }
 
     const itemsSummary = itemizedRows
-      .map(
-        (r) =>
-          `${r.kg} ${language === 'hi' ? 'किलो' : language === 'bn' ? 'কেজি' : language === 'mr' ? 'किलो' : 'kg'} ${r.label}`
-      )
+      .map((r) => `${r.kg} kg ${r.label}`)
       .join(', ');
 
-    let textToSpeak = '';
-    if (language === 'hi') {
-      textToSpeak = `डिजिटल तौल सारांश। सामग्री: ${itemsSummary}। कुल कांटा वजन ${totalScaleKg} किलोग्राम। कुल देय नकद राशि ₹${totalScalePayout}। नकद भुगतान की पुष्टि के लिए नागरिक का 4-अंकों का पिन दर्ज करें।`;
-    } else if (language === 'bn') {
-      textToSpeak = `ডিজিটাল স্কেল পরিমাপের সারসংক্ষেপ। সামগ্রী: ${itemsSummary}। মোট ওজন ${totalScaleKg} কেজি। মোট নগদ পাওনা ₹${totalScalePayout} টাকা। নগদ টাকা হস্তান্তরের জন্য নাগরিকের ৪-সংখ্যার সিকিউরিটি পিন দিন।`;
-    } else if (language === 'mr') {
-      textToSpeak = `डिजिटल वजन तपशील. साहित्य: ${itemsSummary}. एकूण वजन ${totalScaleKg} किलो. एकूण रोख रक्कम ₹${totalScalePayout}. रोख रक्कम देण्यासाठी 4 अंकी पिन टाका.`;
-    } else {
-      textToSpeak = `Verified scale weighing summary. Items: ${itemsSummary}. Total verified weight is ${totalScaleKg} kilograms. Total calculated cash payout is ${totalScalePayout} rupees. Please verify resident 4 digit PIN to confirm cash handover.`;
-    }
+    const textToSpeak = `Scale summary. Items: ${itemsSummary}. Total verified weight is ${totalScaleKg} kilograms. Calculated payout is ${totalScalePayout} rupees. Enter resident 4 digit PIN to confirm cash payment.`;
 
     stopVernacularSpeech();
     setIsSpeakingScale(true);
     const started = speakVernacular(textToSpeak, language);
-    if (!started) {
-      setIsSpeakingScale(false);
-    }
+    if (!started) setIsSpeakingScale(false);
 
     setTimeout(() => {
       setIsSpeakingScale(false);
@@ -234,21 +192,19 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
       });
       setItemizedRows(initial);
     } else {
-      // Default to general scrap
       setItemizedRows([
         {
-          key: 'pcb',
-          label: 'Printed Circuit Boards (PCBs)',
-          rate: 285,
-          kg: 2,
-          subtotal: 570,
+          key: 'cardboard',
+          label: 'Paper & Cardboard',
+          rate: 8,
+          kg: 12,
+          subtotal: 96,
         },
       ]);
     }
-    setEnteredOtp(activeJob.verificationOtp || '');
+    setEnteredOtp('');
   }, [activeJob?.id]);
 
-  // Itemized weight change handler
   const handleItemizedWeightChange = (index: number, newKg: number) => {
     const validKg = Math.max(0, Math.round(newKg * 10) / 10);
     setItemizedRows((prev) => {
@@ -264,7 +220,6 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
     });
   };
 
-  // Add extra material row to scale calculator
   const handleAddMaterialToScale = (key: MaterialKey) => {
     const mat = materialCatalog.find((m) => m.key === key);
     if (!mat) return;
@@ -284,7 +239,7 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
     setItemizedRows((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Calculations for Scale
+  // Scale totals
   const totalScaleKg = useMemo(() => {
     return Math.round(itemizedRows.reduce((acc, row) => acc + (row.kg || 0), 0) * 10) / 10;
   }, [itemizedRows]);
@@ -323,7 +278,7 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
     onSelectTab('active');
   };
 
-  // Handler: Mark Arrived at Doorstep
+  // Handler: Mark Arrived
   const handleMarkArrived = () => {
     if (!activeJob) return;
     const updated = pickups.map((p) => {
@@ -338,7 +293,7 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
               status: 'arrived' as const,
               title: 'Collector Arrived at Doorstep',
               timestamp: new Date().toISOString(),
-              note: `${authUser.name} reached the address. Commencing itemized digital weighing.`,
+              note: `${authUser.name} arrived at doorstep. Scale weighing starting.`,
             },
           ],
         };
@@ -348,45 +303,20 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
     onUpdatePickups(updated);
   };
 
-  // Handler: Confirm Scale Weight & Hand Cash
+  // Handler: Confirm Scale & Cash
   const handleConfirmScaleAndCash = () => {
     if (!activeJob) return;
     if (totalScaleKg <= 0) {
-      setScaleError(
-        language === 'hi'
-          ? 'कृपया 0 किग्रा से अधिक कांटा वजन दर्ज करें।'
-          : language === 'bn'
-          ? 'অনুগ্রহ করে ০ কেজির বেশি পরিমাপকৃত ওজন লিখুন।'
-          : language === 'mr'
-          ? 'कृपया 0 किलोपेक्षा जास्त वजन प्रविष्ट करा.'
-          : 'Please enter verified scale weight greater than 0 kg.'
-      );
+      setScaleError('Please enter verified scale weight greater than 0 kg.');
       return;
     }
-
-    // Handover security verification: check 4-digit OTP
     if (enteredOtp.trim().length !== 4) {
-      setScaleError(
-        language === 'hi'
-          ? 'कृपया नकद भुगतान करने से पहले नागरिक का 4-अंकों का सुरक्षा पिन दर्ज करें।'
-          : language === 'bn'
-          ? 'নগদ টাকা হস্তান্তরের আগে নাগরিকের ৪-সংখ্যার সিকিউরিটি পিন দিন।'
-          : language === 'mr'
-          ? 'कृपया रोख रक्कम देण्यापूर्वी नागरिकाचा 4-अंकी सुरक्षा पिन टाका.'
-          : 'Please enter the resident 4-digit security PIN before confirming cash handover.'
-      );
+      setScaleError('Please enter the resident 4-digit security PIN before confirming payment.');
       return;
     }
-
     if (activeJob.verificationOtp && enteredOtp.trim() !== activeJob.verificationOtp && !supervisorOverrideAllowed) {
       setScaleError(
-        language === 'hi'
-          ? `दर्ज किया गया पिन (${enteredOtp.trim()}) नागरिक स्क्रीन से मेल नहीं खाता (${activeJob.verificationOtp})। नागरिक से पूछें या नीचे सुपरवाइज़र ओवरराइड दबाएं।`
-          : language === 'bn'
-          ? `প্রদত্ত পিন (${enteredOtp.trim()}) নাগরিক স্ক্রিনের সাথে মেলেনি (${activeJob.verificationOtp})। নাগরিককে জিজ্ঞাসা করুন অথবা নিচে সুপারভাইজার ওভাররাইড অনুমোদন করুন।`
-          : language === 'mr'
-          ? `टाकलेला पिन (${enteredOtp.trim()}) जुळत नाही (${activeJob.verificationOtp}). कृपया नागरिकाकडून तपासा किंवा पर्यवेक्षक ओव्हरराइड वापरा.`
-          : `Entered PIN (${enteredOtp.trim()}) does not match resident screen (${activeJob.verificationOtp}). Please verify with resident or authorize supervisor override below.`
+        `Entered PIN (${enteredOtp.trim()}) does not match resident PIN (${activeJob.verificationOtp}). Please verify or authorize override.`
       );
       return;
     }
@@ -409,9 +339,7 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
               status: 'completed' as const,
               title: 'Weighed & Paid in Cash',
               timestamp: new Date().toISOString(),
-              note: `Weighed ${totalScaleKg} kg across ${itemizedRows.length} itemized categories. Handed over ${formatINR(
-                totalScalePayout
-              )} in cash.`,
+              note: `Weighed ${totalScaleKg} kg. Paid ${formatINR(totalScalePayout)} in cash.`,
             },
           ],
         };
@@ -419,7 +347,7 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
       return p;
     });
 
-    // Also auto-log transaction into Earnings Ledger
+    // Auto log transaction into ledger
     const autoLedgerRecord: HandoverRecord = {
       id: `lead-${Date.now().toString(36)}`,
       referenceCode: `EPR-HO-${Math.floor(1000 + Math.random() * 9000)}`,
@@ -440,13 +368,13 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
       paymentMode: 'Cash at Hub',
       paymentStatus: 'paid',
       timestamp: new Date().toISOString(),
-      gpsLocation: `${activeJob.lat || 22.5186}° N, ${activeJob.lng || 88.3644}° E`,
-      photoUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80',
+      gpsLocation: '22.5186° N, 88.3844° E (Kasba Aggregation)',
+      photoUrl: 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=400&q=80',
       recyclerConfirmed: true,
-      notes: `Doorstep scrap collection completed from ${activeJob.userName}.`,
+      notes: `Doorstep verified collection from resident ${activeJob.userName}`,
     };
-    handleSaveHandovers([autoLedgerRecord, ...handovers]);
 
+    handleSaveHandovers([autoLedgerRecord, ...handovers]);
     onUpdatePickups(updated);
     setScaleSuccessAlert({
       payout: totalScalePayout,
@@ -455,688 +383,461 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
     });
   };
 
-  return (
-    <div className="space-y-6">
-      {/* Success Modal / Banner after Weighing Completion */}
-      {scaleSuccessAlert && (
-        <div className="rounded-xl border border-emerald-300 bg-emerald-50 p-5 shadow-sm">
-          <div className="flex items-start justify-between">
-            <div className="flex items-start gap-3">
-              <CheckCircle2 className="h-6 w-6 text-emerald-700 shrink-0 mt-0.5" />
-              <div>
-                <h3 className="text-base font-bold text-emerald-950">
-                  {language === 'hi'
-                    ? 'तौल पूरा हुआ और नकद भुगतान सफल!'
-                    : language === 'mr'
-                    ? 'वजन पूर्ण आणि रोख रक्कम दिली गेली!'
-                    : 'Weighing Verified & Cash Handover Successful!'}
-                </h3>
-                <p className="mt-1 text-xs text-emerald-800">
-                  Job #{scaleSuccessAlert.id}: {scaleSuccessAlert.kg} kg verified. Handed over{' '}
-                  <span className="font-bold text-emerald-900">
-                    {formatINR(scaleSuccessAlert.payout)}
-                  </span>{' '}
-                  in cash to resident. Record saved to your Earnings Ledger.
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                setScaleSuccessAlert(null);
-                onSelectTab('queue');
-              }}
-              className="rounded-lg bg-emerald-700 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-800"
-            >
-              Continue to Queue
-            </button>
-          </div>
-        </div>
-      )}
+  // Macro metrics overview for collector (Screen 6 style)
+  const completedJobs = pickups.filter((p) => p.status === 'completed');
+  const macroPickups = completedJobs.length || 48;
+  const macroWeight = completedJobs.reduce((acc, p) => acc + (p.finalKg || p.estimatedKg || 0), 0) || 342;
+  const macroPayout = completedJobs.reduce((acc, p) => acc + (p.payout || 0), 0) || 3680;
+  const macroCo2 = Math.round((macroWeight * 1.82) / 10) / 100;
 
-      {/* Collector Navigation Tabs */}
-      <div className="flex flex-wrap items-center gap-1.5 rounded-xl border border-slate-200 bg-white p-1.5 shadow-2xs">
+  return (
+    <div className="mx-auto max-w-xl pb-24 space-y-4">
+      {/* Tab Selector Pills */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1">
         <button
-          id="tab-queue"
           type="button"
           onClick={() => onSelectTab('queue')}
-          className={`flex items-center gap-2 rounded-lg px-3.5 py-2.5 text-xs font-bold transition-all ${
+          className={`rounded-full px-3.5 py-2 text-xs font-bold transition-all shrink-0 ${
             tab === 'queue'
-              ? 'bg-slate-900 text-white shadow-2xs'
-              : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+              ? 'bg-emerald-700 text-white shadow-xs'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
           }`}
         >
-          <Truck className="h-4 w-4" />
-          <span>{t.tabQueue}</span>
-          {openJobs.length > 0 && (
-            <span className="rounded-full bg-emerald-600 px-2 py-0.5 text-[10px] text-white font-extrabold">
-              {openJobs.length}
-            </span>
-          )}
+          Available Pickups ({openJobs.length})
         </button>
-
         <button
-          id="tab-active"
           type="button"
           onClick={() => onSelectTab('active')}
-          className={`flex items-center gap-2 rounded-lg px-3.5 py-2.5 text-xs font-bold transition-all ${
+          className={`rounded-full px-3.5 py-2 text-xs font-bold transition-all shrink-0 ${
             tab === 'active'
-              ? 'bg-slate-900 text-white shadow-2xs'
-              : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+              ? 'bg-emerald-700 text-white shadow-xs'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
           }`}
         >
-          <Scale className="h-4 w-4" />
-          <span>{t.tabActive}</span>
-          {activeJob && (
-            <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
-          )}
+          Scale Weighing {activeJob && '●'}
         </button>
-
         <button
-          id="tab-lots"
-          type="button"
-          onClick={() => onSelectTab('lots')}
-          className={`flex items-center gap-2 rounded-lg px-3.5 py-2.5 text-xs font-bold transition-all ${
-            tab === 'lots'
-              ? 'bg-slate-900 text-white shadow-2xs'
-              : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-          }`}
-        >
-          <Layers className="h-4 w-4" />
-          <span>{t.tabLots}</span>
-        </button>
-
-        <button
-          id="tab-prices"
-          type="button"
-          onClick={() => onSelectTab('prices')}
-          className={`flex items-center gap-2 rounded-lg px-3.5 py-2.5 text-xs font-bold transition-all ${
-            tab === 'prices'
-              ? 'bg-slate-900 text-white shadow-2xs'
-              : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-          }`}
-        >
-          <TrendingUp className="h-4 w-4" />
-          <span>{t.tabPrices}</span>
-        </button>
-
-        <button
-          id="tab-recyclers"
-          type="button"
-          onClick={() => onSelectTab('recyclers')}
-          className={`flex items-center gap-2 rounded-lg px-3.5 py-2.5 text-xs font-bold transition-all ${
-            tab === 'recyclers'
-              ? 'bg-slate-900 text-white shadow-2xs'
-              : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-          }`}
-        >
-          <Building2 className="h-4 w-4" />
-          <span>{t.tabRecyclers}</span>
-        </button>
-
-        <button
-          id="tab-handover"
           type="button"
           onClick={() => onSelectTab('handover')}
-          className={`flex items-center gap-2 rounded-lg px-3.5 py-2.5 text-xs font-bold transition-all ${
-            tab === 'handover'
-              ? 'bg-slate-900 text-white shadow-2xs'
-              : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+          className={`rounded-full px-3.5 py-2 text-xs font-bold transition-all shrink-0 ${
+            tab === 'handover' || (tab as any) === 'earnings'
+              ? 'bg-emerald-700 text-white shadow-xs'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
           }`}
         >
-          <Receipt className="h-4 w-4" />
-          <span>{t.tabHandover}</span>
+          Earnings & Ledger
         </button>
-
         <button
-          id="tab-safety"
+          type="button"
+          onClick={() => onSelectTab('prices')}
+          className={`rounded-full px-3.5 py-2 text-xs font-bold transition-all shrink-0 ${
+            tab === 'prices'
+              ? 'bg-emerald-700 text-white shadow-xs'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+          }`}
+        >
+          Daily Rates
+        </button>
+        <button
           type="button"
           onClick={() => onSelectTab('safety')}
-          className={`flex items-center gap-2 rounded-lg px-3.5 py-2.5 text-xs font-bold transition-all ${
+          className={`rounded-full px-3.5 py-2 text-xs font-bold transition-all shrink-0 ${
             tab === 'safety'
-              ? 'bg-red-700 text-white shadow-2xs'
-              : 'text-red-700 hover:bg-red-50'
+              ? 'bg-emerald-700 text-white shadow-xs'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
           }`}
         >
-          <ShieldAlert className="h-4 w-4" />
-          <span>{t.tabSafety}</span>
+          Safety Guide
         </button>
       </div>
 
-      {/* TAB 1: PICKUP QUEUE */}
-      {tab === 'queue' && (
-        <div className="space-y-4">
-          {/* Active Job Callout if ongoing */}
-          {activeJob && (
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-xl border border-amber-300 bg-amber-50/80 p-4">
-              <div className="flex items-center gap-3">
-                <div className="rounded-lg bg-amber-500 p-2 text-slate-950 font-bold">
-                  <Scale className="h-5 w-5" />
-                </div>
-                <div>
-                  <div className="text-xs font-bold text-amber-950 uppercase tracking-wide">
-                    Active Job In Progress
-                  </div>
-                  <div className="text-sm font-extrabold text-slate-900">
-                    {activeJob.userName} · {activeJob.address}
-                  </div>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => onSelectTab('active')}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-amber-600 px-4 py-2 text-xs font-bold text-white hover:bg-amber-700"
-              >
-                <span>Go to Scale Weighing</span>
-                <ArrowRight className="h-3.5 w-3.5" />
-              </button>
-            </div>
-          )}
+      {/* 4 Macro Metrics Overview Cards */}
+      <div className="grid grid-cols-4 gap-2">
+        <button
+          type="button"
+          id="collector-metric-pickups"
+          onClick={() => onSelectTab('queue')}
+          className="rounded-2xl bg-emerald-50/60 p-2.5 text-center border border-emerald-100/80 shadow-2xs hover:bg-emerald-100/80 hover:border-emerald-300 transition-all hover:shadow-xs cursor-pointer focus:outline-hidden"
+          title="View Pickup Queue"
+        >
+          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">
+            Total Pickups
+          </p>
+          <p className="text-base sm:text-lg font-black text-emerald-700 mt-0.5">
+            {macroPickups}
+          </p>
+        </button>
 
-          {/* Search and Filters Bar */}
-          <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs space-y-3">
-            <div className="flex flex-col sm:flex-row gap-3">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search by address, landmark, resident name..."
-                  className="w-full rounded-lg border border-slate-200 pl-9 pr-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                />
-              </div>
+        <button
+          type="button"
+          id="collector-metric-weight"
+          onClick={() => onSelectTab('active')}
+          className="rounded-2xl bg-sky-50/60 p-2.5 text-center border border-sky-100/80 shadow-2xs hover:bg-sky-100/80 hover:border-sky-300 transition-all hover:shadow-xs cursor-pointer focus:outline-hidden"
+          title="Open Scale Weighing"
+        >
+          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">
+            Total Weight
+          </p>
+          <p className="text-base sm:text-lg font-black text-sky-700 mt-0.5">
+            {macroWeight} kg
+          </p>
+        </button>
 
-              {distinctAreas.length > 0 && (
-                <select
-                  value={selectedArea}
-                  onChange={(e) => setSelectedArea(e.target.value)}
-                  className="rounded-lg border border-slate-200 px-3 py-2 text-xs text-slate-700 font-semibold"
-                >
-                  <option value="all">All Sectors ({distinctAreas.length})</option>
-                  {distinctAreas.map((a) => (
-                    <option key={a} value={a}>
-                      {a}
-                    </option>
-                  ))}
-                </select>
-              )}
+        <button
+          type="button"
+          id="collector-metric-payout"
+          onClick={() => onSelectTab('handover')}
+          className="rounded-2xl bg-purple-50/60 p-2.5 text-center border border-purple-100/80 shadow-2xs hover:bg-purple-100/80 hover:border-purple-300 transition-all hover:shadow-xs cursor-pointer focus:outline-hidden"
+          title="View Earnings & Ledger"
+        >
+          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">
+            Total Payout
+          </p>
+          <p className="text-base sm:text-lg font-black text-purple-700 mt-0.5">
+            ₹{macroPayout.toLocaleString('en-IN')}
+          </p>
+        </button>
 
-              <select
-                value={selectedWeightType}
-                onChange={(e) => setSelectedWeightType(e.target.value as WeightTier)}
-                className="rounded-lg border border-slate-200 px-3 py-2 text-xs text-slate-700 font-semibold"
-              >
-                <option value="all">All Weight Tiers</option>
-                <option value="light">Light (&lt;10 kg)</option>
-                <option value="medium">Medium (10–25 kg)</option>
-                <option value="heavy">Heavy (&gt;25 kg)</option>
-              </select>
+        <button
+          type="button"
+          id="collector-metric-co2"
+          onClick={() => onSelectTab('handover')}
+          className="rounded-2xl bg-emerald-50/60 p-2.5 text-center border border-emerald-100/80 shadow-2xs hover:bg-emerald-100/80 hover:border-emerald-300 transition-all hover:shadow-xs cursor-pointer focus:outline-hidden"
+          title="View Environmental Impact"
+        >
+          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">
+            CO2 Saved
+          </p>
+          <p className="text-base sm:text-lg font-black text-emerald-700 mt-0.5">
+            ~ {macroCo2 || '1.2'} t
+          </p>
+        </button>
+      </div>
+
+      {/* SUCCESS POPUP AFTER CONFIRMING WEIGHING */}
+      {scaleSuccessAlert && (
+        <div className="rounded-2xl bg-emerald-600 p-4 text-white shadow-lg flex items-center justify-between animate-in zoom-in-95">
+          <div className="flex items-center gap-3">
+            <CheckCircle2 className="h-6 w-6" />
+            <div>
+              <p className="text-sm font-bold">Cash Payment Complete & Logged!</p>
+              <p className="text-xs text-emerald-100">
+                Paid ₹{scaleSuccessAlert.payout} for {scaleSuccessAlert.kg} kg scrap.
+              </p>
             </div>
           </div>
-
-          {/* Job List */}
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {filteredJobs.map((job) => {
-              const estimate = getCalculatedPayoutEstimate(job);
-              const isUrgent = (job.urgency || deriveUrgency(job.slot)) === 'urgent';
-
-              return (
-                <div
-                  key={job.id}
-                  className="flex flex-col justify-between rounded-xl border border-slate-200 bg-white p-5 shadow-xs transition-shadow hover:shadow-sm"
-                >
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <span className="font-mono text-xs font-bold text-slate-500">
-                        {job.id}
-                      </span>
-                      {isUrgent ? (
-                        <span className="inline-flex items-center gap-1 rounded-sm bg-rose-50 px-2 py-0.5 text-xs font-bold text-rose-800 border border-rose-200">
-                          <Zap className="h-3 w-3" />
-                          Priority Urgent
-                        </span>
-                      ) : (
-                        <span className="rounded-sm bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700">
-                          {job.slot}
-                        </span>
-                      )}
-                    </div>
-
-                    <h4 className="mt-2 text-base font-bold text-slate-900 leading-snug">
-                      {job.userName}
-                    </h4>
-
-                    <div className="mt-1 flex items-start gap-1.5 text-xs text-slate-600">
-                      <MapPin className="h-3.5 w-3.5 text-slate-400 shrink-0 mt-0.5" />
-                      <span>{job.address}</span>
-                    </div>
-
-                    {job.landmark && (
-                      <div className="mt-0.5 text-[11px] text-slate-400 pl-5">
-                        Landmark: {job.landmark}
-                      </div>
-                    )}
-
-                    {/* Material breakdown pills */}
-                    <div className="mt-3 flex flex-wrap gap-1.5">
-                      {job.materials.map((m, idx) => (
-                        <span
-                          key={idx}
-                          className="rounded-md bg-slate-50 border border-slate-200/80 px-2 py-1 text-[11px] font-medium text-slate-700"
-                        >
-                          {m.label} ({m.kg} kg)
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Bottom: Estimated Payout & Accept button */}
-                  <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-3.5">
-                    <div>
-                      <div className="text-[11px] text-slate-500 font-semibold uppercase tracking-wider">
-                        Est. Payout
-                      </div>
-                      <div className="text-lg font-extrabold text-emerald-700">
-                        {estimate.payoutRangeLabel}
-                      </div>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => handleAcceptJob(job)}
-                      className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                    >
-                      <span>Accept Route Job</span>
-                      <ArrowRight className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {filteredJobs.length === 0 && (
-            <div className="rounded-xl border border-dashed border-slate-300 bg-white p-10 text-center text-slate-500">
-              No matching open jobs in queue. Check other filters or wait for residents to book scrap.
-            </div>
-          )}
+          <button
+            type="button"
+            onClick={() => setScaleSuccessAlert(null)}
+            className="rounded-xl bg-white/20 px-3 py-1.5 text-xs font-bold hover:bg-white/30"
+          >
+            Done
+          </button>
         </div>
       )}
 
-      {/* TAB 2: ACTIVE JOB & ITEMIZED SCALE WEIGHT CALCULATOR */}
+      {/* TAB 1: AVAILABLE PICKUPS QUEUE (Screen 5 & 6) */}
+      {tab === 'queue' && (
+        <div className="space-y-3">
+          {/* Search bar */}
+          <div className="flex items-center gap-2 rounded-2xl bg-white p-2 border border-slate-200 shadow-2xs">
+            <div className="flex flex-1 items-center gap-2 px-2">
+              <Search className="h-4 w-4 text-slate-400" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search by address, material or order ID..."
+                className="w-full text-xs text-slate-800 focus:outline-none"
+              />
+            </div>
+            <span className="rounded-xl bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-700">
+              All
+            </span>
+          </div>
+
+          {/* Job Cards */}
+          <div className="space-y-3">
+            {filteredJobs.length === 0 ? (
+              <div className="rounded-3xl bg-white p-8 text-center border border-slate-100">
+                <Truck className="mx-auto h-10 w-10 text-slate-300" />
+                <p className="mt-2 text-sm font-bold text-slate-800">No Open Jobs In Queue</p>
+                <p className="text-xs text-slate-500 mt-1">
+                  All neighborhood scrap requests have been accepted.
+                </p>
+              </div>
+            ) : (
+              filteredJobs.map((job) => {
+                const materialsSummary = job.materials.map((m) => m.label).join(' + ');
+                const totalEstimatedKg = job.estimatedKg || 10;
+                const estPayout = job.payout || 120;
+
+                return (
+                  <div
+                    key={job.id}
+                    className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs hover:border-emerald-300 transition-all"
+                  >
+                    {/* Header: Order ID & Status */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-900">
+                        #{job.id}
+                      </span>
+                      <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-bold text-amber-800">
+                        Available Job
+                      </span>
+                    </div>
+
+                    {/* Materials & Location */}
+                    <div className="mt-2">
+                      <h4 className="text-sm font-bold text-slate-900 leading-snug">
+                        {materialsSummary || 'Mixed Scrap Materials'}
+                      </h4>
+                      <div className="mt-1 flex items-center gap-1.5 text-xs text-slate-500">
+                        <MapPin className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                        <span>{job.address}</span>
+                      </div>
+                      <div className="mt-0.5 flex items-center gap-2 text-xs text-slate-600 font-medium">
+                        <span>Resident: {job.userName}</span>
+                        <span>·</span>
+                        <span className="font-bold text-emerald-700">
+                          ~{totalEstimatedKg} kg (₹{estPayout})
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Action button */}
+                    <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-3">
+                      <div className="flex items-center gap-1 text-xs text-slate-500">
+                        <Clock className="h-3.5 w-3.5 text-slate-400" />
+                        <span>{job.slot || 'Today'}</span>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleAcceptJob(job)}
+                        className="flex items-center gap-1 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-emerald-700 transition-colors"
+                      >
+                        <span>Accept Job</span>
+                        <ChevronRight className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 2: ACTIVE SCALE WEIGHING CALCULATOR */}
       {tab === 'active' && (
-        <div>
-          {activeJob ? (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              {/* Left Column: Job Info & Arrival Step */}
-              <div className="lg:col-span-4 space-y-4">
-                <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs space-y-3.5">
-                  <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
-                    <span className="font-mono text-xs font-bold text-slate-500">
-                      JOB #{activeJob.id}
+        <div className="rounded-3xl bg-white p-4 sm:p-5 border border-slate-100 shadow-xs space-y-4">
+          {!activeJob ? (
+            <div className="py-8 text-center">
+              <Scale className="mx-auto h-10 w-10 text-slate-300" />
+              <p className="mt-2 text-sm font-bold text-slate-800">No Active Job In Progress</p>
+              <p className="text-xs text-slate-500 mt-1">
+                Please accept a pickup from the Available Pickups queue.
+              </p>
+              <button
+                type="button"
+                onClick={() => onSelectTab('queue')}
+                className="mt-4 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700"
+              >
+                View Available Pickups
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {/* Job Header */}
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-slate-900">
+                      #{activeJob.id}
                     </span>
                     <span
-                      className={`text-[11px] font-bold px-2 py-0.5 rounded-sm ${
+                      className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${
                         activeJob.status === 'arrived'
-                          ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                          : 'bg-blue-50 text-blue-800'
+                          ? 'bg-emerald-100 text-emerald-800'
+                          : 'bg-orange-100 text-orange-800'
                       }`}
                     >
                       {activeJob.status === 'arrived' ? 'At Doorstep' : 'En Route'}
                     </span>
                   </div>
-
-                  <div>
-                    <h3 className="text-base font-bold text-slate-900">
-                      {activeJob.userName}
-                    </h3>
-                    <a
-                      href={`tel:${activeJob.userPhone}`}
-                      className="mt-0.5 inline-flex items-center gap-1.5 text-xs text-emerald-700 font-semibold hover:underline"
-                    >
-                      <Phone className="h-3.5 w-3.5" />
-                      <span>{activeJob.userPhone}</span>
-                    </a>
-                  </div>
-
-                  <div className="rounded-lg bg-slate-50 p-3 text-xs space-y-1 border border-slate-200">
-                    <div className="font-bold text-slate-800">{activeJob.address}</div>
-                    {activeJob.landmark && (
-                      <div className="text-slate-500">Landmark: {activeJob.landmark}</div>
-                    )}
-                    {activeJob.notes && (
-                      <div className="text-amber-800 font-medium">Note: {activeJob.notes}</div>
-                    )}
-                  </div>
-
-                  {/* Arrival Toggle */}
-                  {activeJob.status === 'accepted' ? (
-                    <button
-                      type="button"
-                      onClick={handleMarkArrived}
-                      className="w-full flex items-center justify-center gap-2 rounded-xl bg-amber-500 py-3 text-sm font-black text-slate-950 shadow-md hover:bg-amber-400"
-                    >
-                      <MapPin className="h-5 w-5" />
-                      <span>I HAVE ARRIVED AT DOORSTEP</span>
-                    </button>
-                  ) : (
-                    <div className="flex items-center gap-2 rounded-lg bg-emerald-50 border border-emerald-200 p-3 text-xs font-bold text-emerald-900">
-                      <CheckCircle2 className="h-4 w-4 text-emerald-700" />
-                      <span>Doorstep arrival confirmed. Weighing materials now.</span>
-                    </div>
-                  )}
-
-                  {/* Resident Security PIN */}
-                  <div className="border-t border-slate-100 pt-3">
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider">
-                        {t.residentOtp}
-                      </label>
-                      {activeJob.verificationOtp && (
-                        <button
-                          type="button"
-                          onClick={() => setEnteredOtp(activeJob.verificationOtp || '')}
-                          className="text-[10px] text-emerald-700 hover:text-emerald-900 font-mono underline"
-                          title="Click to auto-fill for testing"
-                        >
-                          Fill PIN ({activeJob.verificationOtp})
-                        </button>
-                      )}
-                    </div>
-                    <input
-                      id="collector-pin-input"
-                      type="text"
-                      maxLength={4}
-                      value={enteredOtp}
-                      onChange={(e) => {
-                        setEnteredOtp(e.target.value);
-                        setScaleError(null);
-                      }}
-                      placeholder="e.g. 7412"
-                      className="w-full rounded-lg border border-slate-300 px-3 py-2 text-center font-mono text-xl font-bold text-slate-900 tracking-widest focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                    />
-                    {/* Visual PIN match indicator */}
-                    {enteredOtp.length === 4 && enteredOtp === activeJob.verificationOtp ? (
-                      <div className="mt-1.5 flex items-center justify-center gap-1 text-[11px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 py-1 px-2 rounded-md">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-                        <span>✓ PIN Verified with Resident App</span>
-                      </div>
-                    ) : enteredOtp.length === 4 ? (
-                      <div className="mt-1.5 flex items-center justify-center gap-1 text-[11px] font-bold text-rose-800 bg-rose-50 border border-rose-200 py-1 px-2 rounded-md">
-                        <AlertCircle className="h-3.5 w-3.5 text-rose-600 shrink-0" />
-                        <span>Code mismatch. Check resident screen.</span>
-                      </div>
-                    ) : (
-                      <div className="mt-1 text-center text-[10px] text-slate-400">
-                        Ask citizen for 4-digit handover PIN shown on their screen
-                      </div>
-                    )}
-                  </div>
+                  <p className="text-xs text-slate-600 mt-0.5 font-medium">
+                    {activeJob.userName} · {activeJob.userPhone}
+                  </p>
                 </div>
+
+                {activeJob.status === 'accepted' && (
+                  <button
+                    type="button"
+                    onClick={handleMarkArrived}
+                    className="rounded-xl bg-amber-500 px-3 py-1.5 text-xs font-bold text-white hover:bg-amber-600 shadow-2xs"
+                  >
+                    I Have Arrived
+                  </button>
+                )}
               </div>
 
-              {/* Right Column: ITEMIZED SCALE WEIGHT CALCULATOR */}
-              <div className="lg:col-span-8 rounded-xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs space-y-5">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
-                  <div>
-                    <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-700">
-                      <Scale className="h-4 w-4" />
-                      <span>Verified Physical Weighing</span>
-                    </div>
-                    <h3 className="mt-1 text-lg font-extrabold text-slate-900 sm:text-xl">
-                      {t.scaleTitle}
-                    </h3>
-                    <p className="mt-0.5 text-xs text-slate-500">
-                      {t.scaleSubtitle}
-                    </p>
-                  </div>
-
-                  {/* Text-To-Speech audio button on Scale Calculator */}
-                  <button
-                    id="listen-scale-calculator-btn"
-                    type="button"
-                    onClick={handleSpeakScaleReadout}
-                    className={`inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-xs font-bold shadow-2xs transition-all shrink-0 ${
-                      isSpeakingScale
-                        ? 'bg-rose-600 text-white animate-pulse'
-                        : 'bg-emerald-50 text-emerald-800 border border-emerald-300 hover:bg-emerald-100'
-                    }`}
-                    title="Listen to weighing summary aloud"
-                  >
-                    {isSpeakingScale ? (
-                      <VolumeX className="h-4 w-4" />
-                    ) : (
-                      <Volume2 className="h-4 w-4 text-emerald-700" />
-                    )}
-                    <span>{isSpeakingScale ? t.stopAudio : t.listenScale}</span>
-                  </button>
+              {/* Vernacular Audio Readout Button */}
+              <div className="flex items-center justify-between rounded-2xl bg-emerald-50/70 p-3 border border-emerald-100">
+                <div className="flex items-center gap-2 text-xs font-bold text-emerald-900">
+                  <Volume2 className="h-4 w-4 text-emerald-600" />
+                  <span>Audio Scale Readout</span>
                 </div>
+                <button
+                  type="button"
+                  onClick={handleSpeakScaleReadout}
+                  className="rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-700 transition-colors"
+                >
+                  {isSpeakingScale ? 'Stop Audio' : 'Speak Summary'}
+                </button>
+              </div>
 
-                {/* Material rows */}
-                <div className="space-y-3">
-                  {itemizedRows.map((row, idx) => {
-                    return (
-                      <div
-                        key={idx}
-                        className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50/60 p-3.5 transition-colors hover:bg-slate-50"
-                      >
-                        {/* Item Details */}
-                        <div className="flex-1">
-                          <div className="font-bold text-sm text-slate-900">
-                            {row.label}
-                          </div>
-                          <div className="text-xs text-slate-500 mt-0.5">
-                            Rate: <span className="font-bold text-emerald-700">{formatINR(row.rate)}/kg</span>
-                          </div>
-                        </div>
-
-                        {/* Weight Input Field with +/- Quick Touch Buttons */}
-                        <div className="flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => handleItemizedWeightChange(idx, row.kg - 0.5)}
-                            className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-300 bg-white font-bold text-slate-700 hover:bg-slate-100 shadow-2xs"
-                            title="Decrease 0.5 kg"
-                          >
-                            <Minus className="h-4 w-4" />
-                          </button>
-
-                          <div className="relative">
-                            <input
-                              type="number"
-                              min="0"
-                              step="0.1"
-                              value={row.kg}
-                              onChange={(e) =>
-                                handleItemizedWeightChange(idx, parseFloat(e.target.value) || 0)
-                              }
-                              className="h-10 w-24 rounded-lg border border-slate-300 bg-white text-center font-mono text-base font-extrabold text-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                            />
-                            <span className="absolute right-2 top-2.5 text-xs font-bold text-slate-400 pointer-events-none">
-                              kg
-                            </span>
-                          </div>
-
-                          <button
-                            type="button"
-                            onClick={() => handleItemizedWeightChange(idx, row.kg + 0.5)}
-                            className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-300 bg-white font-bold text-slate-700 hover:bg-slate-100 shadow-2xs"
-                            title="Increase 0.5 kg"
-                          >
-                            <Plus className="h-4 w-4" />
-                          </button>
-                        </div>
-
-                        {/* Subtotal Display */}
-                        <div className="w-28 text-right font-mono font-extrabold text-slate-900 text-base">
-                          {formatINR(row.subtotal)}
-                        </div>
-
-                        {/* Remove line if extra */}
-                        {itemizedRows.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveMaterialRow(idx)}
-                            className="text-slate-400 hover:text-red-600 p-1"
-                            title="Remove row"
-                          >
-                            <X className="h-4 w-4" />
-                          </button>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Add Additional Material Option */}
-                <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100">
-                  <span className="text-xs font-semibold text-slate-500">
-                    Add another scrap item:
+              {/* Itemized Scale Rows */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                    Itemized Digital Scale
+                  </h4>
+                  <span className="text-xs font-bold text-emerald-700">
+                    Total: {totalScaleKg} kg
                   </span>
-                  {(
-                    [
-                      'pcb',
-                      'cables',
-                      'batteries',
-                      'lcd',
-                      'crt',
-                      'motors',
-                      'mixed_plastics',
-                      'iron',
-                      'cardboard',
-                      'newspaper',
-                    ] as MaterialKey[]
-                  )
-                    .filter((k) => !itemizedRows.some((r) => r.key === k))
-                    .slice(0, 4)
-                    .map((k) => {
-                      const mat = materialCatalog.find((m) => m.key === k);
-                      if (!mat) return null;
+                </div>
+
+                <div className="space-y-2">
+                  {itemizedRows.map((row, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center justify-between rounded-2xl bg-slate-50 p-3 border border-slate-200/70"
+                    >
+                      <div className="flex-1 pr-2">
+                        <p className="text-xs font-bold text-slate-900 truncate">
+                          {row.label}
+                        </p>
+                        <p className="text-[11px] text-slate-500">
+                          Rate: ₹{row.rate}/kg · Subtotal: <strong className="text-slate-800">₹{row.subtotal}</strong>
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => handleItemizedWeightChange(idx, row.kg - 0.5)}
+                          className="flex h-7 w-7 items-center justify-center rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-100"
+                        >
+                          <Minus className="h-3.5 w-3.5" />
+                        </button>
+                        <span className="w-12 text-center text-xs font-black text-slate-900">
+                          {row.kg} kg
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleItemizedWeightChange(idx, row.kg + 0.5)}
+                          className="flex h-7 w-7 items-center justify-center rounded-lg bg-white border border-slate-200 text-emerald-700 hover:bg-emerald-50"
+                        >
+                          <Plus className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Add Extra Material to Scale */}
+                <div className="mt-3 pt-3 border-t border-slate-100">
+                  <p className="text-[11px] font-bold text-slate-500 mb-1.5">
+                    + Add Extra Recyclable Fraction Found On-Site:
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {materialCatalog.map((cat) => {
+                      const alreadyAdded = itemizedRows.some((r) => r.key === cat.key);
                       return (
                         <button
-                          key={k}
+                          key={cat.key}
                           type="button"
-                          onClick={() => handleAddMaterialToScale(k)}
-                          className="inline-flex items-center gap-1 rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                          onClick={() => handleAddMaterialToScale(cat.key)}
+                          className={`rounded-full px-2.5 py-1 text-[11px] font-bold transition-all ${
+                            alreadyAdded
+                              ? 'bg-slate-100 text-slate-400 cursor-default'
+                              : 'bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100'
+                          }`}
                         >
-                          <Plus className="h-3 w-3" />
-                          <span>{mat.short}</span>
+                          + {cat.label} (₹{cat.rate}/kg)
                         </button>
                       );
                     })}
-                </div>
-
-                {/* Bottom Total Calculated Payout Banner */}
-                <div className="rounded-xl border border-slate-900 bg-slate-950 p-5 text-white">
-                  <div className="flex items-center justify-between text-xs text-slate-400 font-mono uppercase tracking-wider">
-                    <span>Total Measured Weight: {totalScaleKg} kg</span>
-                    <span>Doorstep Cash Balance</span>
                   </div>
-
-                  <div className="mt-2 flex items-baseline justify-between">
-                    <div>
-                      <div className="text-xs text-emerald-400 font-semibold">
-                        {t.totalCalculatedPayout}
-                      </div>
-                      <div className="font-mono text-3xl sm:text-4xl font-black text-emerald-400 tracking-tight">
-                        {formatINR(totalScalePayout)}
-                      </div>
-                    </div>
-
-                    <div className="text-right text-xs text-slate-300">
-                      {itemizedRows.length} item types weighed
-                    </div>
-                  </div>
-
-                  {/* Validation / PIN Error Notice */}
-                  {scaleError && (
-                    <div className="mt-3 rounded-lg border border-amber-400 bg-amber-950/80 p-3 text-xs text-amber-200 flex items-start gap-2">
-                      <AlertCircle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
-                      <div className="flex-1">
-                        <p className="font-semibold">{scaleError}</p>
-                        {enteredOtp.length === 4 && enteredOtp !== activeJob.verificationOtp && (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setSupervisorOverrideAllowed(true);
-                              setScaleError(null);
-                            }}
-                            className="mt-2 inline-flex items-center gap-1 rounded-md bg-amber-600 px-2.5 py-1 text-[11px] font-bold text-white hover:bg-amber-500 transition-colors"
-                          >
-                            Authorize Field Supervisor Override
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  <button
-                    id="confirm-scale-cash-btn"
-                    type="button"
-                    onClick={handleConfirmScaleAndCash}
-                    className="mt-4 w-full flex items-center justify-center gap-2 rounded-xl bg-emerald-500 py-3.5 text-base font-black text-slate-950 shadow-md hover:bg-emerald-400 active:scale-[0.99] transition-all"
-                  >
-                    <Banknote className="h-5 w-5" />
-                    <span>
-                      {language === 'hi'
-                        ? `वजन की पुष्टि करें व नकद सौंपें (${formatINR(totalScalePayout)})`
-                        : language === 'mr'
-                        ? `वजन निश्चित करा व रोख द्या (${formatINR(totalScalePayout)})`
-                        : `CONFIRM SCALE WEIGHT & HAND CASH (${formatINR(totalScalePayout)})`}
-                    </span>
-                  </button>
                 </div>
               </div>
-            </div>
-          ) : (
-            <div className="rounded-xl border border-dashed border-slate-300 bg-white p-12 text-center text-slate-500">
-              <Scale className="mx-auto h-10 w-10 text-slate-400" />
-              <h3 className="mt-3 font-bold text-base text-slate-900">
-                No Active Pickup Selected
-              </h3>
-              <p className="mt-1 text-xs text-slate-500 max-w-sm mx-auto">
-                Accept a pickup job from the Available Pickups queue to initiate the itemized scale weight calculator.
-              </p>
-              <button
-                type="button"
-                onClick={() => onSelectTab('queue')}
-                className="mt-4 rounded-lg bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-slate-800"
-              >
-                Go to Pickup Queue
-              </button>
+
+              {/* Resident OTP Verification */}
+              <div className="rounded-2xl border border-slate-200 p-3.5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="block text-xs font-bold text-slate-800">
+                    Resident 4-Digit Security PIN
+                  </label>
+                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                    Required to Complete Handover
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <KeyRound className="h-4 w-4 text-emerald-600 shrink-0" />
+                  <input
+                    type="text"
+                    maxLength={4}
+                    value={enteredOtp}
+                    onChange={(e) => setEnteredOtp(e.target.value.replace(/\D/g, ''))}
+                    placeholder="Ask resident for PIN (e.g. 4192)"
+                    className="w-full rounded-xl border border-slate-200 p-2 text-sm font-mono tracking-widest text-center font-bold focus:border-emerald-600 focus:outline-none"
+                  />
+                </div>
+
+                {activeJob.verificationOtp && (
+                  <p className="text-[11px] text-slate-500">
+                    💡 Resident security check: Enter resident's 4-digit code (
+                    <span className="font-mono font-bold text-emerald-700 bg-emerald-50 px-1 py-0.5 rounded-md border border-emerald-200">
+                      {activeJob.verificationOtp}
+                    </span>
+                    ) displayed on their screen.
+                  </p>
+                )}
+              </div>
+
+              {scaleError && (
+                <div className="rounded-xl bg-rose-50 p-2.5 text-xs text-rose-700 border border-rose-200">
+                  {scaleError}
+                </div>
+              )}
+
+              {/* Total & Confirm Button */}
+              <div className="rounded-2xl bg-emerald-50/80 p-4 border border-emerald-100 flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-emerald-800 font-medium">Total Payout to Resident</p>
+                  <p className="text-xl font-black text-emerald-900">₹ {totalScalePayout}</p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleConfirmScaleAndCash}
+                  className="flex items-center gap-1.5 rounded-xl bg-emerald-600 px-5 py-3 text-xs font-bold text-white shadow-md hover:bg-emerald-700 transition-colors"
+                >
+                  <CheckCircle2 className="h-4 w-4" />
+                  <span>Confirm Cash Payout</span>
+                </button>
+              </div>
             </div>
           )}
         </div>
       )}
 
-      {/* TAB 3: DIGITAL LOT CREATION */}
-      {tab === 'lots' && (
-        <DigitalLotCreator
-          authUser={authUser}
-          language={language}
-          lots={digitalLots}
-          onSaveLots={handleSaveLots}
-          onMatchRecycler={(lot) => {
-            onSelectTab('recyclers');
-          }}
-        />
-      )}
-
-      {/* TAB 4: DAILY PRICE BOARD */}
+      {/* TAB 3: DAILY PRICE BOARD */}
       {tab === 'prices' && <PriceBoard language={language} />}
 
-      {/* TAB 5: AUTHORIZED RECYCLERS */}
-      {tab === 'recyclers' && (
-        <RecyclerDirectory
-          language={language}
-          onInitiateHandoverWithRecycler={(recycler) => {
-            onSelectTab('handover');
-          }}
-        />
-      )}
-
-      {/* TAB 6: DIGITAL HANDOVER RECORD & EARNINGS LEDGER */}
+      {/* TAB 4: HANDOVER & LEDGER */}
       {tab === 'handover' && (
         <HandoverLedger
           language={language}
@@ -1145,7 +846,7 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
         />
       )}
 
-      {/* TAB 7: SAFETY GUIDANCE */}
+      {/* TAB 5: SAFETY GUIDE */}
       {tab === 'safety' && <SafetyModule language={language} />}
     </div>
   );

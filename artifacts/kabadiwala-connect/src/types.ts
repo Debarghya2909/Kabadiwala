@@ -1,7 +1,8 @@
-export type Role = 'household' | 'collector' | 'impact';
+export type Role = 'household' | 'collector' | 'recycler' | 'impact';
 export type AppView = 'login' | 'household' | 'collector' | 'impact';
 export type HouseholdTab = 'schedule' | 'tracking' | 'history' | 'safety' | 'prices';
 export type CollectorTab = 'queue' | 'active' | 'lots' | 'prices' | 'recyclers' | 'handover' | 'earnings' | 'safety';
+export type ImpactTab = 'overview' | 'traceability' | 'handovers' | 'audit';
 
 export type Language = 'en' | 'hi' | 'bn' | 'mr';
 
@@ -19,7 +20,9 @@ export type MaterialKey =
   | 'mixed_plastics'
   | 'iron'
   | 'cardboard'
-  | 'newspaper';
+  | 'newspaper'
+  | 'glass'
+  | 'wet_waste';
 
 export interface MaterialLine {
   key: MaterialKey;
@@ -31,7 +34,7 @@ export interface MaterialLine {
   rate: number; // in INR per kg
   kg: number;
   color: string;
-  category: 'ewaste' | 'metal' | 'battery' | 'display' | 'plastic' | 'paper';
+  category: 'ewaste' | 'metal' | 'battery' | 'display' | 'plastic' | 'paper' | 'glass' | 'organic';
   description: string;
   descriptionHi: string;
   descriptionBn?: string;
@@ -96,11 +99,12 @@ export interface Pickup {
   completedAt?: string;
   timeline: PickupTimelineItem[];
   rating?: CollectorRating;
+  isSegregated?: boolean;
 }
 
 export interface AuthUser {
   id: string;
-  role: 'household' | 'collector';
+  role: Role;
   name: string;
   phone: string;
   address?: string;

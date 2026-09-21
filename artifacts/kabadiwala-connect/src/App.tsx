@@ -5,11 +5,13 @@ import { LoginView } from './components/LoginView';
 import { HouseholdPortal } from './components/HouseholdPortal';
 import { CollectorPortal } from './components/CollectorPortal';
 import { ImpactDashboard } from './components/ImpactDashboard';
+import { BottomNav } from './components/BottomNav';
 import {
   AppView,
   AuthUser,
   HouseholdTab,
   CollectorTab,
+  ImpactTab,
   Pickup,
   Language,
 } from './types';
@@ -25,6 +27,7 @@ import {
   UPDATE_EVENT_PICKUPS,
   UPDATE_EVENT_AUTH,
 } from './data/mockData';
+import { stopVernacularSpeech } from './lib/i18n';
 
 export function App() {
   // Language State
@@ -47,7 +50,9 @@ export function App() {
   const [currentView, setCurrentView] = useState<AppView>(() => {
     const savedUser = readAuthUserFromStorage();
     if (!savedUser) return 'login';
-    return savedUser.role === 'collector' ? 'collector' : 'household';
+    if (savedUser.role === 'collector') return 'collector';
+    if (savedUser.role === 'recycler' || (savedUser.role as any) === 'impact') return 'impact';
+    return 'household';
   });
 
   // Data state
@@ -56,6 +61,7 @@ export function App() {
   // Sub-tabs
   const [householdTab, setHouseholdTab] = useState<HouseholdTab>('schedule');
   const [collectorTab, setCollectorTab] = useState<CollectorTab>('queue');
+  const [impactTab, setImpactTab] = useState<ImpactTab>('overview');
   const [activeTrackingId, setActiveTrackingId] = useState<string | null>(null);
 
   // Synchronize across browser tabs and events
@@ -99,14 +105,32 @@ export function App() {
 
   // Explicit Sign Out button: returns cleanly to the login selection screen
   const handleSignOut = () => {
+    stopVernacularSpeech();
     setAuthUser(null);
     saveAuthUserToStorage(null);
     setCurrentView('login');
   };
 
+  const activeSubTab =
+    currentView === 'household'
+      ? householdTab
+      : currentView === 'collector'
+      ? collectorTab
+      : impactTab;
+
+  const handleSelectSubTab = (t: any) => {
+    if (currentView === 'household') {
+      setHouseholdTab(t);
+    } else if (currentView === 'collector') {
+      setCollectorTab(t);
+    } else if (currentView === 'impact') {
+      setImpactTab(t);
+    }
+  };
+
   return (
-    <div className="flex min-h-screen flex-col bg-slate-100/70 text-slate-800 antialiased font-sans">
-      {/* Enterprise Navigation Header with subtle backdrop-blur and thin bottom border */}
+    <div className="flex min-h-screen flex-col bg-slate-50 text-slate-800 antialiased font-sans">
+      {/* Enterprise Navigation Header with emerald bar matching visual reference */}
       <EnterpriseHeader
         authUser={authUser}
         onSignOut={handleSignOut}
@@ -117,7 +141,7 @@ export function App() {
       />
 
       {/* Main Viewport */}
-      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 lg:px-8">
+      <main className="mx-auto w-full max-w-5xl flex-1 px-3 py-4 sm:px-6 sm:py-6">
         {currentView === 'login' && (
           <LoginView
             onLogin={handleLogin}
@@ -154,6 +178,8 @@ export function App() {
         {currentView === 'impact' && (
           <ImpactDashboard
             pickups={pickups}
+            tab={impactTab}
+            onSelectTab={setImpactTab}
             onBack={() => {
               if (authUser) {
                 setCurrentView(authUser.role === 'collector' ? 'collector' : 'household');
@@ -167,8 +193,17 @@ export function App() {
         )}
       </main>
 
+      {/* Clean Mobile Bottom Navigation Bar matching visual mockup */}
+      <BottomNav
+        currentView={currentView}
+        onNavigateView={setCurrentView}
+        activeTab={activeSubTab}
+        onSelectTab={handleSelectSubTab}
+        authUser={authUser}
+      />
+
       {/* Clean Minimal Enterprise Footer */}
-      <EnterpriseFooter />
+      {currentView === 'login' && <EnterpriseFooter />}
     </div>
   );
 }

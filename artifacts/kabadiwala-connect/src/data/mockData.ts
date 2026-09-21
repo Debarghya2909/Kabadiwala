@@ -217,6 +217,46 @@ export const materialCatalog: MaterialLine[] = [
     trend: 'up',
     trendPercent: '+1.8%',
   },
+  {
+    key: 'glass',
+    label: 'Glass Bottles, Jars & Culinary Glass',
+    labelHi: 'कांच की बोतलें व शीशे का सामान',
+    labelBn: 'কাঁচের বোতল, বয়াম ও পরিষ্কার কাচ',
+    labelMr: 'काचेच्या बाटल्या आणि भांडी',
+    short: 'Glass',
+    rate: 6,
+    kg: 5,
+    color: '#0284c7',
+    category: 'glass',
+    description: 'Cullet glass, intact beverage bottles, culinary glassware, medicine vials',
+    descriptionHi: 'पेय पदार्थों की बोतलें, कांच के जार, दवाई की शीशियां',
+    descriptionBn: 'অক্ষত পানীয়ের বোতল, কাচের জার ও পরিষ্কার বোতল',
+    descriptionMr: 'काचेच्या बाटल्या, जार आणि बरण्या',
+    marketRange: '₹4 – ₹7 / kg',
+    trend: 'stable',
+    trendPercent: '0.0%',
+    hazardousNote: 'Pack glass carefully in sturdy cartons to prevent breaking and puncture injuries.',
+  },
+  {
+    key: 'wet_waste',
+    label: 'Segregated Kitchen & Organic Wet Waste',
+    labelHi: 'अलग किया हुआ गीला / रसोई का जैविक कचरा',
+    labelBn: 'আলাদা করা ভেজা রান্নাঘরের জৈব বর্জ্য',
+    labelMr: 'स्वयंपाकघरातील ओला सेंद्रिय कचरा',
+    short: 'Wet Waste',
+    rate: 2,
+    kg: 8,
+    color: '#16a34a',
+    category: 'organic',
+    description: 'Segregated vegetable peels, fruit scrap, compostable leftovers for local biomethanation',
+    descriptionHi: 'सब्जी के छिलके, फलों के अवशेष और रसोई का खाद योग्य कचरा (बायोगैस व कम्पोस्टिंग हेतु)',
+    descriptionBn: 'সবজির খোসা, ফল ও খাবারের অবশিষ্টাংশ যা স্থানীয় বায়োগ্যাস ও কম্পোস্টিংয়ের জন্য উপযোগী',
+    descriptionMr: 'भाजीपाल्याची साले, फळे व अन्न कचरा (बायोगॅस व खतासाठी)',
+    marketRange: '₹2 / kg (Swachh Segregation Bonus)',
+    trend: 'stable',
+    trendPercent: '+50 pts',
+    hazardousNote: 'Keep strictly free from plastics or batteries. High moisture enables clean odor-free composting.',
+  },
 ];
 
 export const safetyGuides: SafetyGuideItem[] = [
@@ -498,6 +538,18 @@ export const defaultCollectorUser: AuthUser = {
   rating: 4.9,
   completedTrips: 184,
   preferredLanguage: 'hi',
+};
+
+export const defaultRecyclerUser: AuthUser = {
+  id: 'usr-recycler-301',
+  role: 'recycler',
+  name: 'Kolkata Municipal Corp & CPCB EPR Desk',
+  phone: '+91 33 2286 1000',
+  partnerId: 'EPR-AUDIT-KMC-2026',
+  zone: 'West Bengal State Pollution Control Board & KMC Central Yard',
+  rating: 5.0,
+  completedTrips: 1420,
+  preferredLanguage: 'en',
 };
 
 export function formatINR(val: number): string {

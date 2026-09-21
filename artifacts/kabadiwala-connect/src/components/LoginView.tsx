@@ -1,23 +1,32 @@
 import React, { useState } from 'react';
 import {
+  Recycle,
   User,
-  Truck,
   ArrowRight,
   ShieldCheck,
-  CheckCircle2,
+  Building2,
+  TreePine,
   Scale,
+  Link as LinkIcon,
+  Home,
+  Truck,
+  Layers,
   Sparkles,
   Phone,
-  FileCheck2,
-  BookOpen,
+  CheckCircle2,
 } from 'lucide-react';
-import { AuthUser, AppView, Language } from '../types';
-import { defaultHouseholdUser, defaultCollectorUser } from '../data/mockData';
-import { getTranslation } from '../lib/i18n';
+import { AuthUser, Language, AppView } from '../types';
+import {
+  defaultHouseholdUser,
+  defaultCollectorUser,
+  defaultRecyclerUser,
+} from '../data/mockData';
+import { getTranslation, languageNames } from '../lib/i18n';
+import { CollectorHeroIllustration } from './Illustrations';
 
 interface LoginViewProps {
   onLogin: (user: AuthUser, initialView: AppView) => void;
-  onExploreESG?: () => void;
+  onExploreESG: () => void;
   language: Language;
   onLanguageChange?: (lang: Language) => void;
 }
@@ -28,372 +37,459 @@ export const LoginView: React.FC<LoginViewProps> = ({
   language,
   onLanguageChange,
 }) => {
-  const [selectedRole, setSelectedRole] = useState<'household' | 'collector'>('household');
   const t = getTranslation(language);
+  const [showCustomModal, setShowCustomModal] = useState<
+    'collector' | 'household' | 'recycler' | null
+  >(null);
 
-  // Custom household inputs
-  const [hName, setHName] = useState(defaultHouseholdUser.name);
-  const [hPhone, setHPhone] = useState(defaultHouseholdUser.phone);
-  const [hAddress, setHAddress] = useState(defaultHouseholdUser.address || '');
+  // Custom Form state
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [area, setArea] = useState('');
 
-  // Custom collector inputs
-  const [cName, setCName] = useState(defaultCollectorUser.name);
-  const [cPhone, setCPhone] = useState(defaultCollectorUser.phone);
-  const [cVehicle, setCVehicle] = useState(defaultCollectorUser.vehicle || 'Electric Cargo Trike (WB-02-AK-4192)');
-  const [cZone, setCZone] = useState(defaultCollectorUser.zone || 'South Kolkata & Central Route Cluster');
-
-  const handleQuickDemoHousehold = () => {
-    onLogin({ ...defaultHouseholdUser, preferredLanguage: language }, 'household');
-  };
-
-  const handleQuickDemoCollector = () => {
+  const handleCollectorLogin = () => {
     onLogin({ ...defaultCollectorUser, preferredLanguage: language }, 'collector');
   };
 
-  const handleCustomHouseholdSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const user: AuthUser = {
-      id: `usr-h-${Date.now().toString(36)}`,
-      role: 'household',
-      name: hName.trim() || 'Resident Citizen',
-      phone: hPhone.trim() || '+91 98300 00000',
-      address: hAddress.trim() || 'Ballygunge Park Road, Kolkata',
-      zone: 'Kolkata Metro Cluster',
-      completedTrips: 4,
-      preferredLanguage: language,
-    };
-    onLogin(user, 'household');
+  const handleHouseholdLogin = () => {
+    onLogin({ ...defaultHouseholdUser, preferredLanguage: language }, 'household');
   };
 
-  const handleCustomCollectorSubmit = (e: React.FormEvent) => {
+  const handleRecyclerLogin = () => {
+    onLogin({ ...defaultRecyclerUser, preferredLanguage: language }, 'impact');
+  };
+
+  const handleCustomSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const user: AuthUser = {
-      id: `usr-c-${Date.now().toString(36)}`,
-      role: 'collector',
-      name: cName.trim() || 'Field Partner',
-      phone: cPhone.trim() || '+91 98310 00000',
-      partnerId: `KC-EPR-${Math.floor(100 + Math.random() * 900)}`,
-      vehicle: cVehicle.trim() || 'Cargo Vehicle',
-      zone: cZone.trim() || 'South Kolkata Axis',
-      rating: 4.9,
-      completedTrips: 184,
-      preferredLanguage: language,
-    };
-    onLogin(user, 'collector');
+    if (showCustomModal === 'collector') {
+      const user: AuthUser = {
+        id: `c-${Date.now().toString(36)}`,
+        role: 'collector',
+        name: name.trim() || 'Raju Mondal',
+        phone: phone.trim() || '+91 98310 12345',
+        partnerId: `KC-${Math.floor(1000 + Math.random() * 9000)}`,
+        vehicle: 'Electric Cargo Trike (WB-02-AK-4192)',
+        zone: area.trim() || 'Gariahat & South Kolkata',
+        rating: 4.9,
+        completedTrips: 184,
+        preferredLanguage: language,
+      };
+      onLogin(user, 'collector');
+    } else if (showCustomModal === 'recycler') {
+      const user: AuthUser = {
+        id: `r-${Date.now().toString(36)}`,
+        role: 'recycler',
+        name: name.trim() || 'Municipal Waste & Recycler Desk',
+        phone: phone.trim() || '+91 33 2286 1000',
+        partnerId: 'EPR-AUDIT-KMC-2026',
+        zone: area.trim() || 'Central Municipal Yard',
+        rating: 5.0,
+        completedTrips: 1420,
+        preferredLanguage: language,
+      };
+      onLogin(user, 'impact');
+    } else {
+      const user: AuthUser = {
+        id: `h-${Date.now().toString(36)}`,
+        role: 'household',
+        name: name.trim() || 'Deblina Mukherjee',
+        phone: phone.trim() || '+91 98300 54321',
+        address: area.trim() || 'Flat 3B, Ballygunge Park Road, Kolkata',
+        zone: 'Ballygunge Ward 69',
+        completedTrips: 7,
+        preferredLanguage: language,
+      };
+      onLogin(user, 'household');
+    }
+    setShowCustomModal(null);
   };
 
   return (
-    <div className="mx-auto max-w-4xl py-6 sm:py-10">
-      {/* Top Banner / Hero */}
-      <div className="text-center">
-        <div className="flex items-center justify-center gap-2 text-xs font-semibold text-emerald-700 tracking-wide">
-          <ShieldCheck className="h-4 w-4 text-emerald-600 shrink-0" />
-          <span>Formal E-Waste & Scrap Recycling Network · CPCB EPR Compliant</span>
-        </div>
-        <h1 className="mt-2.5 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
-          {t.appTitle}
-        </h1>
-        <p className="mx-auto mt-2 max-w-2xl text-sm leading-relaxed text-slate-600 sm:text-base">
-          {t.tagline}
-        </p>
-      </div>
+    <div className="mx-auto max-w-5xl py-2 sm:py-6 space-y-6">
+      {/* Top Banner: Institutional Municipal solid waste & EPR Header */}
+      <div className="rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-8 shadow-xs">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+          {/* Left Text */}
+          <div className="md:col-span-7 space-y-3">
+            <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-800 border border-emerald-200">
+              <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
+              <span>National Urban Waste Mission • Formal Municipal E-Waste & Scrap Network</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 leading-tight">
+              Kabadiwala Connect
+            </h1>
+            <p className="text-sm font-medium leading-relaxed text-slate-600">
+              Institutional Solid Waste Segregation, Disposal, and Sanitization Platform.
+              Connecting households directly with informal waste collectors, on-site verified digital scales, and authorized CPCB recycling yards under EPR 2022.
+            </p>
+            <div className="flex flex-wrap items-center gap-2 pt-1 text-xs text-slate-500 font-medium">
+              <span className="flex items-center gap-1">
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" /> 100% Manual Address (No Maps)
+              </span>
+              <span className="flex items-center gap-1">
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" /> 4-Digit Security PIN
+              </span>
+              <span className="flex items-center gap-1">
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" /> CPCB Traceability
+              </span>
+            </div>
+          </div>
 
-      {/* Role Selection Switcher */}
-      <div className="mt-8 flex justify-center">
-        <div className="inline-flex rounded-lg border border-slate-200 bg-slate-100 p-1.5 shadow-2xs">
-          <button
-            id="role-tab-household"
-            type="button"
-            onClick={() => setSelectedRole('household')}
-            className={`flex items-center gap-2 rounded-md px-5 py-2.5 text-sm font-bold transition-all ${
-              selectedRole === 'household'
-                ? 'bg-white text-slate-900 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <User className="h-4 w-4 text-emerald-600" />
-            <span>{t.citizenPortal}</span>
-          </button>
-          <button
-            id="role-tab-collector"
-            type="button"
-            onClick={() => setSelectedRole('collector')}
-            className={`flex items-center gap-2 rounded-md px-5 py-2.5 text-sm font-bold transition-all ${
-              selectedRole === 'collector'
-                ? 'bg-white text-slate-900 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <Truck className="h-4 w-4 text-emerald-600" />
-            <span>{t.collectorPortal}</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Role Specific Login Card */}
-      <div className="mt-6">
-        {selectedRole === 'household' ? (
-          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-            <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
-              <div className="flex-1">
-                <div className="inline-flex items-center gap-1.5 rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800 border border-emerald-200">
-                  <User className="h-3.5 w-3.5" />
-                  <span>
-                    {language === 'hi' ? 'नागरिक व घरेलू पोर्टल' : language === 'mr' ? 'घरगुती व रहिवासी पोर्टल' : 'Household & Citizen'}
-                  </span>
-                </div>
-                <h2 className="mt-2 text-xl font-bold text-slate-900">
-                  {language === 'hi'
-                    ? 'घर से ई-कचरा व रद्दी स्क्रैप बेचें'
-                    : language === 'mr'
-                    ? 'घरी बसून ई-कचरा व भंगार विका'
-                    : 'Schedule Doorstep E-Waste & Scrap Collection'}
-                </h2>
-                <p className="mt-1 text-xs text-slate-600 sm:text-sm">
-                  {language === 'hi'
-                    ? 'पारदर्शी डिजिटल तौल, मौके पर नकद भुगतान और प्रमाणित रीसाइक्लिंग रसीद।'
-                    : language === 'mr'
-                    ? 'अचूक डिजिटल वजन, तात्काळ रोख रक्कम आणि अधिकृत रिसायकलिंग खात्री.'
-                    : 'Get fair market pricing, doorstep collection, instant cash on scale weighing, and guaranteed formal recycling.'}
+          {/* Right Hero Graphic */}
+          <div className="md:col-span-5 flex justify-center">
+            <div className="overflow-hidden rounded-2xl bg-gradient-to-b from-emerald-50/60 to-emerald-100/40 p-4 border border-emerald-100 w-full max-w-xs shadow-2xs">
+              <CollectorHeroIllustration className="w-full h-auto max-h-48 object-contain" />
+              <div className="mt-2 text-center">
+                <p className="text-[11px] font-bold text-slate-800">
+                  Doorstep Segregation • Digital Scale • Cash on Delivery
                 </p>
-
-                {/* Quick 1-Click Demo Login */}
-                <div className="mt-5 rounded-lg border border-emerald-100 bg-emerald-50/70 p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="text-xs font-bold text-emerald-900">
-                        {language === 'hi' ? 'त्वरित डेमो परीक्षण' : language === 'mr' ? 'झटपट डेमो प्रवेश' : 'One-Tap Quick Demo'}
-                      </div>
-                      <div className="text-xs text-emerald-700">
-                        Deblina Mukherjee (+91 98301 44829)
-                      </div>
-                    </div>
-                    <button
-                      id="quick-login-household-btn"
-                      type="button"
-                      onClick={handleQuickDemoHousehold}
-                      className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                    >
-                      <span>
-                        {language === 'hi' ? 'सीधे प्रवेश करें' : language === 'mr' ? 'प्रवेश करा' : 'Enter Portal'}
-                      </span>
-                      <ArrowRight className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Custom Form */}
-                <form onSubmit={handleCustomHouseholdSubmit} className="mt-5 space-y-3.5 border-t border-slate-100 pt-5">
-                  <div className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                    {language === 'hi' ? 'या अपना विवरण दर्ज करें' : language === 'mr' ? 'किंवा आपली माहिती भरा' : 'Or Enter Custom Details'}
-                  </div>
-
-                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    <div>
-                      <label className="block text-xs font-medium text-slate-700">
-                        {language === 'hi' ? 'पूरा नाम' : language === 'mr' ? 'पूर्ण नाव' : 'Full Name'}
-                      </label>
-                      <input
-                        id="household-name-input"
-                        type="text"
-                        value={hName}
-                        onChange={(e) => setHName(e.target.value)}
-                        className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                        placeholder="e.g. Deblina Mukherjee"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-slate-700">
-                        {language === 'hi' ? 'मोबाइल नंबर' : language === 'mr' ? 'मोबाईल नंबर' : 'Phone Number'}
-                      </label>
-                      <input
-                        id="household-phone-input"
-                        type="text"
-                        value={hPhone}
-                        onChange={(e) => setHPhone(e.target.value)}
-                        className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                        placeholder="+91 98300 00000"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-medium text-slate-700">
-                      {language === 'hi' ? 'घर का पता' : language === 'mr' ? 'घराचा पत्ता' : 'Address'}
-                    </label>
-                    <input
-                      id="household-address-input"
-                      type="text"
-                      value={hAddress}
-                      onChange={(e) => setHAddress(e.target.value)}
-                      className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                      placeholder="Street address, building, locality"
-                      required
-                    />
-                  </div>
-
-                  <button
-                    id="custom-household-submit-btn"
-                    type="submit"
-                    className="w-full rounded-lg border border-slate-300 bg-slate-50 py-2.5 text-xs font-bold text-slate-800 hover:bg-slate-100 transition-colors"
-                  >
-                    {language === 'hi' ? 'कस्टम खाते से लॉगिन करें' : language === 'mr' ? 'खाते उघडून पुढे जा' : 'Continue with Details'}
-                  </button>
-                </form>
               </div>
             </div>
           </div>
-        ) : (
-          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-            <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
-              <div className="flex-1">
-                <div className="inline-flex items-center gap-1.5 rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800 border border-emerald-200">
-                  <Truck className="h-3.5 w-3.5" />
-                  <span>
-                    {language === 'hi' ? 'कबाड़ीवाला व फील्ड पार्टनर' : language === 'mr' ? 'कबाडी व संकलन भागीदार' : 'Field Collector Partner'}
-                  </span>
+        </div>
+      </div>
+
+      {/* 3 Isolated Role-Based Login Entry Points */}
+      <div>
+        <div className="mb-4">
+          <h2 className="text-lg sm:text-xl font-black tracking-tight text-slate-900">
+            Select Your Portal
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+            Choose your role in the three-sided recycling ecosystem to enter your dedicated, isolated workspace.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+          {/* PORTAL 1: Household / Citizen */}
+          <div
+            id="portal-card-household"
+            className="group flex flex-col justify-between rounded-3xl border border-slate-200/90 bg-white p-5 sm:p-6 shadow-xs hover:border-emerald-500 hover:shadow-md transition-all"
+          >
+            <div>
+              {/* Badge & Icon */}
+              <div className="flex items-center justify-between">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-100 text-sky-700 shadow-2xs">
+                  <Home className="h-6 w-6 stroke-[2.2]" />
                 </div>
-                <h2 className="mt-2 text-xl font-bold text-slate-900">
-                  {language === 'hi'
-                    ? 'अनौपचारिक कबाड़ी साथी ईपीआर नेटवर्क'
-                    : language === 'mr'
-                    ? 'असंघटित कबाडी अधिकृत ईपीआर नेटवर्क'
-                    : 'Formal Recycler Linkage & Digital Scale Portal'}
-                </h2>
-                <p className="mt-1 text-xs text-slate-600 sm:text-sm">
-                  {language === 'hi'
-                    ? 'कांटे का सामग्री-वार डिजिटल तौल, नकद कैलकुलेटर, आज का भाव बोर्ड, व अधिकृत रीसाइक्लर्स को सीधा हैंडओवर।'
-                    : language === 'mr'
-                    ? 'वस्तूनिहाय डिजिटल वजन, रोख गणक, आजचे थेट बाजारभाव आणि अधिकृत रीसायकलर्सकडे थेट विक्री.'
-                    : 'Access itemized digital scale calculator, daily price discovery, safety training, digital lot creation, and direct handovers.'}
-                </p>
-
-                {/* Quick 1-Click Demo Login */}
-                <div className="mt-5 rounded-lg border border-emerald-100 bg-emerald-50/70 p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="text-xs font-bold text-emerald-900">
-                        {language === 'hi' ? 'साथी त्वरित डेमो लॉगिन' : language === 'mr' ? 'भागीदार झटपट लॉगिन' : 'Certified Partner Quick Demo'}
-                      </div>
-                      <div className="text-xs text-emerald-700">
-                        Raju Das (Partner ID: KC-EPR-204 · Electric Cargo Trike)
-                      </div>
-                    </div>
-                    <button
-                      id="quick-login-collector-btn"
-                      type="button"
-                      onClick={handleQuickDemoCollector}
-                      className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                    >
-                      <span>
-                        {language === 'hi' ? 'फील्ड पोर्टल खोलें' : language === 'mr' ? 'फील्ड पोर्टल उघडा' : 'Open Field Portal'}
-                      </span>
-                      <ArrowRight className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Custom Form */}
-                <form onSubmit={handleCustomCollectorSubmit} className="mt-5 space-y-3.5 border-t border-slate-100 pt-5">
-                  <div className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                    {language === 'hi' ? 'या अपना साथी विवरण दर्ज करें' : language === 'mr' ? 'किंवा नवीन भागीदार नोंदणी' : 'Or Custom Partner Setup'}
-                  </div>
-
-                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    <div>
-                      <label className="block text-xs font-medium text-slate-700">
-                        {language === 'hi' ? 'साथी का नाम' : language === 'mr' ? 'भागीदाराचे नाव' : 'Partner Name'}
-                      </label>
-                      <input
-                        id="collector-name-input"
-                        type="text"
-                        value={cName}
-                        onChange={(e) => setCName(e.target.value)}
-                        className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                        placeholder="e.g. Raju Das"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-slate-700">
-                        {language === 'hi' ? 'मोबाइल नंबर' : language === 'mr' ? 'मोबाईल नंबर' : 'Phone Number'}
-                      </label>
-                      <input
-                        id="collector-phone-input"
-                        type="text"
-                        value={cPhone}
-                        onChange={(e) => setCPhone(e.target.value)}
-                        className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                        placeholder="+91 98312 00000"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    <div>
-                      <label className="block text-xs font-medium text-slate-700">
-                        {language === 'hi' ? 'वाहन का प्रकार' : language === 'mr' ? 'वाहनाचा प्रकार' : 'Vehicle'}
-                      </label>
-                      <input
-                        id="collector-vehicle-input"
-                        type="text"
-                        value={cVehicle}
-                        onChange={(e) => setCVehicle(e.target.value)}
-                        className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                        placeholder="Electric Cargo Trike / Pushcart"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-slate-700">
-                        {language === 'hi' ? 'सक्रिय कार्यक्षेत्र / क्लस्टर' : language === 'mr' ? 'कार्यक्षेत्र' : 'Operating Route / Cluster'}
-                      </label>
-                      <input
-                        id="collector-zone-input"
-                        type="text"
-                        value={cZone}
-                        onChange={(e) => setCZone(e.target.value)}
-                        className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                        placeholder="e.g. South Kolkata Axis"
-                      />
-                    </div>
-                  </div>
-
-                  <button
-                    id="custom-collector-submit-btn"
-                    type="submit"
-                    className="w-full rounded-lg border border-slate-300 bg-slate-50 py-2.5 text-xs font-bold text-slate-800 hover:bg-slate-100 transition-colors"
-                  >
-                    {language === 'hi' ? 'साथी खाते से लॉगिन करें' : language === 'mr' ? 'भागीदार म्हणून पुढे जा' : 'Continue as Collector Partner'}
-                  </button>
-                </form>
+                <span className="rounded-full bg-sky-50 px-2.5 py-1 text-[11px] font-bold text-sky-700 border border-sky-200/80">
+                  Source & Demand Side
+                </span>
               </div>
+
+              {/* Title & Description */}
+              <div className="mt-4">
+                <h3 className="text-lg font-black tracking-tight text-slate-900 group-hover:text-emerald-700 transition-colors">
+                  1. Household / Citizen Portal
+                </h3>
+                <p className="mt-1.5 text-xs text-slate-600 leading-relaxed">
+                  Practice source segregation across Dry Recyclables, Wet/Compostable Waste, and E-Waste. Request doorstep scrap pickups with manual address entry and live lifecycle tracking.
+                </p>
+              </div>
+
+              {/* Feature Highlights */}
+              <ul className="mt-4 space-y-1.5 text-xs text-slate-500 border-t border-slate-100 pt-3">
+                <li className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  <span>Itemized scrap selection & est. payout</span>
+                </li>
+                <li className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  <span>Doorstep address & landmark entry</span>
+                </li>
+                <li className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  <span>4-digit resident security PIN</span>
+                </li>
+                <li className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  <span>Post-pickup rating & segregation audit</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Actions */}
+            <div className="mt-6 space-y-2">
+              <button
+                id="enter-household-portal-btn"
+                type="button"
+                onClick={handleHouseholdLogin}
+                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-600 py-3 text-xs font-bold text-white shadow-xs hover:bg-emerald-700 transition-colors"
+              >
+                <span>Enter Household Portal</span>
+                <ArrowRight className="h-4 w-4" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowCustomModal('household')}
+                className="w-full text-center text-[11px] font-semibold text-slate-500 hover:text-emerald-700 py-1"
+              >
+                Or enter custom citizen phone / address &rarr;
+              </button>
             </div>
           </div>
-        )}
+
+          {/* PORTAL 2: Informal Collector / Field Partner */}
+          <div
+            id="portal-card-collector"
+            className="group flex flex-col justify-between rounded-3xl border-2 border-emerald-500/80 bg-emerald-50/40 p-5 sm:p-6 shadow-xs hover:border-emerald-600 hover:shadow-md transition-all"
+          >
+            <div>
+              {/* Badge & Icon */}
+              <div className="flex items-center justify-between">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-600 text-white shadow-xs">
+                  <Truck className="h-6 w-6 stroke-[2.2]" />
+                </div>
+                <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-bold text-emerald-800 border border-emerald-300">
+                  Execution & Field Side
+                </span>
+              </div>
+
+              {/* Title & Description */}
+              <div className="mt-4">
+                <h3 className="text-lg font-black tracking-tight text-slate-900 group-hover:text-emerald-700 transition-colors">
+                  2. Informal Collector Portal
+                </h3>
+                <p className="mt-1.5 text-xs text-slate-600 leading-relaxed">
+                  Empowering informal waste collectors and trike partners. Accept nearby household jobs, arrive at doorstep, unlock scale weighing via 4-digit PIN, and track earnings ledger.
+                </p>
+              </div>
+
+              {/* Feature Highlights */}
+              <ul className="mt-4 space-y-1.5 text-xs text-slate-600 border-t border-emerald-100 pt-3">
+                <li className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
+                  <span>Live job queue & 1-click acceptance</span>
+                </li>
+                <li className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
+                  <span>Doorstep arrival & PIN unlock</span>
+                </li>
+                <li className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
+                  <span>Itemized digital scale weight calculator</span>
+                </li>
+                <li className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
+                  <span>Daily earnings ledger & yard handovers</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Actions */}
+            <div className="mt-6 space-y-2">
+              <button
+                id="enter-collector-portal-btn"
+                type="button"
+                onClick={handleCollectorLogin}
+                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-700 py-3 text-xs font-bold text-white shadow-xs hover:bg-emerald-800 transition-colors"
+              >
+                <span>Enter Collector Portal</span>
+                <ArrowRight className="h-4 w-4" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowCustomModal('collector')}
+                className="w-full text-center text-[11px] font-semibold text-slate-600 hover:text-emerald-800 py-1"
+              >
+                Or enter custom collector ID &rarr;
+              </button>
+            </div>
+          </div>
+
+          {/* PORTAL 3: Authorized Recycler & Municipal Dashboard */}
+          <div
+            id="portal-card-recycler"
+            className="group flex flex-col justify-between rounded-3xl border border-slate-200/90 bg-white p-5 sm:p-6 shadow-xs hover:border-emerald-500 hover:shadow-md transition-all"
+          >
+            <div>
+              {/* Badge & Icon */}
+              <div className="flex items-center justify-between">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-100 text-purple-700 shadow-2xs">
+                  <Building2 className="h-6 w-6 stroke-[2.2]" />
+                </div>
+                <span className="rounded-full bg-purple-50 px-2.5 py-1 text-[11px] font-bold text-purple-700 border border-purple-200/80">
+                  Compliance & ESG Desk
+                </span>
+              </div>
+
+              {/* Title & Description */}
+              <div className="mt-4">
+                <h3 className="text-lg font-black tracking-tight text-slate-900 group-hover:text-emerald-700 transition-colors">
+                  3. Authorized Recycler & Municipal Desk
+                </h3>
+                <p className="mt-1.5 text-xs text-slate-600 leading-relaxed">
+                  Institutional visibility for municipal corporations and formal CPCB recyclers. Dynamic ESG metrics, landfill diversion logs, segregation compliance rate, and chain-of-custody audit.
+                </p>
+              </div>
+
+              {/* Feature Highlights */}
+              <ul className="mt-4 space-y-1.5 text-xs text-slate-500 border-t border-slate-100 pt-3">
+                <li className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-purple-500" />
+                  <span>Landfill waste diverted (kg) & CO₂ offset</span>
+                </li>
+                <li className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-purple-500" />
+                  <span>Source segregation compliance rate %</span>
+                </li>
+                <li className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-purple-500" />
+                  <span>End-to-end traceability audit table</span>
+                </li>
+                <li className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-purple-500" />
+                  <span>1-click CPCB Form IV EPR CSV export</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Actions */}
+            <div className="mt-6 space-y-2">
+              <button
+                id="enter-recycler-portal-btn"
+                type="button"
+                onClick={handleRecyclerLogin}
+                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-900 py-3 text-xs font-bold text-white shadow-xs hover:bg-slate-800 transition-colors"
+              >
+                <span>Enter Municipal / Recycler Desk</span>
+                <ArrowRight className="h-4 w-4" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowCustomModal('recycler')}
+                className="w-full text-center text-[11px] font-semibold text-slate-500 hover:text-emerald-700 py-1"
+              >
+                Or enter institutional credentials &rarr;
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Municipal & EPR Impact Link */}
-      <div className="mt-8 text-center">
-        <button
-          id="explore-esg-btn"
-          type="button"
-          onClick={onExploreESG}
-          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 hover:text-emerald-700 transition-colors"
-        >
-          <BookOpen className="h-4 w-4" />
-          <span>
-            {language === 'hi'
-              ? 'नगरपालिका ईपीआर रीसाइक्लिंग व ई-कचरा डेटा डैशबोर्ड देखें'
-              : language === 'mr'
-              ? 'महानगरपालिका ईपीआर व ई-कचरा प्रभाव डॅशबोर्ड पहा'
-              : 'View Municipal EPR Circular Economy & E-Waste Impact Dashboard'}
-          </span>
-          <ArrowRight className="h-3.5 w-3.5" />
-        </button>
+      {/* 3 Core Value Pillars */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="flex items-center gap-3 rounded-2xl bg-white p-3.5 border border-slate-200/70 shadow-2xs">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+            <TreePine className="h-4 w-4" />
+          </div>
+          <div>
+            <p className="text-xs font-bold text-slate-900">Landfill Diversion</p>
+            <p className="text-[11px] text-slate-500">
+              Recover high-purity copper, PCBs, & dry fractions
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 rounded-2xl bg-white p-3.5 border border-slate-200/70 shadow-2xs">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
+            <Scale className="h-4 w-4" />
+          </div>
+          <div>
+            <p className="text-xs font-bold text-slate-900">Fair Field Weighing</p>
+            <p className="text-[11px] text-slate-500">
+              Itemized digital scales with daily EPR benchmark rates
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 rounded-2xl bg-white p-3.5 border border-slate-200/70 shadow-2xs">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-purple-100 text-purple-700">
+            <LinkIcon className="h-4 w-4" />
+          </div>
+          <div>
+            <p className="text-xs font-bold text-slate-900">Formal Recycler Link</p>
+            <p className="text-[11px] text-slate-500">
+              Zero open burning; 100% CPCB yard custody
+            </p>
+          </div>
+        </div>
       </div>
+
+      {/* Custom Credentials Modal */}
+      {showCustomModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-xs">
+          <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl border border-slate-100">
+            <h3 className="text-lg font-bold text-slate-900">
+              {showCustomModal === 'collector'
+                ? 'Informal Collector Credentials'
+                : showCustomModal === 'recycler'
+                ? 'Municipal / Recycler Credentials'
+                : 'Household Citizen Details'}
+            </h3>
+            <p className="text-xs text-slate-500 mt-1">
+              Enter your details to personalize your portal session.
+            </p>
+
+            <form onSubmit={handleCustomSubmit} className="mt-4 space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Full Name</label>
+                <input
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder={
+                    showCustomModal === 'collector'
+                      ? 'e.g. Ramesh Mondal'
+                      : showCustomModal === 'recycler'
+                      ? 'e.g. KMC Inspection Officer'
+                      : 'e.g. Ananya Sen'
+                  }
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Mobile Number / Partner ID
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+91 98300 12345"
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Area / Ward / Street Address
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={area}
+                  onChange={(e) => setArea(e.target.value)}
+                  placeholder="e.g. Ballygunge Ward 69, Kolkata"
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
+                />
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowCustomModal(null)}
+                  className="flex-1 rounded-xl border border-slate-200 py-2.5 text-xs font-bold text-slate-600 hover:bg-slate-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 rounded-xl bg-emerald-600 py-2.5 text-xs font-bold text-white hover:bg-emerald-700"
+                >
+                  Enter Portal
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
