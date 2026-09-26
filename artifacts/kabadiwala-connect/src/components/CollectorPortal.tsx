@@ -54,7 +54,7 @@ import {
   readHandoversFromStorage,
   saveHandoversToStorage,
 } from '../data/mockData';
-import { getTranslation, speakVernacular, stopVernacularSpeech } from '../lib/i18n';
+import { getTranslation, useVernacularAudio } from '../lib/i18n';
 import { SafetyModule } from './SafetyModule';
 import { PriceBoard } from './PriceBoard';
 import { RecyclerDirectory } from './RecyclerDirectory';
@@ -142,30 +142,43 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
     id: string;
   } | null>(null);
 
-  const [isSpeakingScale, setIsSpeakingScale] = useState(false);
+  const { isPlaying, activeId, playAudio, stopAudio, text: spokenScaleText } = useVernacularAudio();
+  const isSpeakingScale = isPlaying && activeId === 'scale-readout';
 
   // Text-To-Speech audio readout for scale weighing calculator
   const handleSpeakScaleReadout = () => {
     if (isSpeakingScale) {
-      stopVernacularSpeech();
-      setIsSpeakingScale(false);
+      stopAudio();
       return;
     }
 
-    const itemsSummary = itemizedRows
-      .map((r) => `${r.kg} kg ${r.label}`)
-      .join(', ');
+    let textToSpeak = '';
+    if (language === 'bn') {
+      const itemsSummaryBn = itemizedRows
+        .map((r) => {
+          const item = materialCatalog.find((c) => c.key === r.key);
+          const name = item?.labelBn || r.label;
+          return `${r.kg} কেজি ${name}`;
+        })
+        .join(', ');
+      textToSpeak = `ডিজিটাল স্কেলের বিবরণ। সামগ্রী: ${itemsSummaryBn}। মোট যাচাইকৃত ওজন ${totalScaleKg.toFixed(2)} কেজি। মোট প্রদেয় নগদ অর্থ ${totalScalePayout.toFixed(2)} টাকা। নগদ পরিশোধ নিশ্চিত করতে নাগরিকের ৪-সংখ্যার সিকিউরিটি পিন লিখুন।`;
+    } else if (language === 'hi') {
+      const itemsSummaryHi = itemizedRows
+        .map((r) => {
+          const item = materialCatalog.find((c) => c.key === r.key);
+          const name = item?.labelHi || r.label;
+          return `${r.kg} किलो ${name}`;
+        })
+        .join(', ');
+      textToSpeak = `डिजिटल कांटा तौल सारांश। सामग्री: ${itemsSummaryHi}। कुल सत्यापित वजन ${totalScaleKg.toFixed(2)} किलोग्राम। कुल देय नकद राशि ${totalScalePayout.toFixed(2)} रुपये। नकद भुगतान की पुष्टि के लिए नागरिक का ४-अंकों का पिन दर्ज करें।`;
+    } else {
+      const itemsSummary = itemizedRows
+        .map((r) => `${r.kg} kg ${r.label}`)
+        .join(', ');
+      textToSpeak = `Scale weighing summary. Items: ${itemsSummary}. Total verified weight is ${totalScaleKg.toFixed(2)} kilograms. Calculated payout is ${totalScalePayout.toFixed(2)} rupees. Enter resident 4 digit PIN to confirm cash payment.`;
+    }
 
-    const textToSpeak = `Scale summary. Items: ${itemsSummary}. Total verified weight is ${totalScaleKg} kilograms. Calculated payout is ${totalScalePayout} rupees. Enter resident 4 digit PIN to confirm cash payment.`;
-
-    stopVernacularSpeech();
-    setIsSpeakingScale(true);
-    const started = speakVernacular(textToSpeak, language);
-    if (!started) setIsSpeakingScale(false);
-
-    setTimeout(() => {
-      setIsSpeakingScale(false);
-    }, 12000);
+    playAudio(textToSpeak, language, 'scale-readout');
   };
 
   // Sync itemized rows whenever activeJob changes
@@ -187,7 +200,7 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
           label: m.label || catalogItem?.label || m.key,
           rate,
           kg: m.kg,
-          subtotal: Math.round(m.kg * rate),
+          subtotal: Math.round(m.kg * rate * 100) / 100,
         };
       });
       setItemizedRows(initial);
@@ -206,14 +219,15 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
   }, [activeJob?.id]);
 
   const handleItemizedWeightChange = (index: number, newKg: number) => {
-    const validKg = Math.max(0, Math.round(newKg * 10) / 10);
+    const validKg = Math.max(0, Math.round(newKg * 100) / 100);
     setItemizedRows((prev) => {
       const copy = [...prev];
       if (copy[index]) {
+        const subtotal = Math.round(validKg * copy[index].rate * 100) / 100;
         copy[index] = {
           ...copy[index],
           kg: validKg,
-          subtotal: Math.round(validKg * copy[index].rate),
+          subtotal,
         };
       }
       return copy;
@@ -241,11 +255,12 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
 
   // Scale totals
   const totalScaleKg = useMemo(() => {
-    return Math.round(itemizedRows.reduce((acc, row) => acc + (row.kg || 0), 0) * 10) / 10;
+    return Math.round(itemizedRows.reduce((acc, row) => acc + (row.kg || 0), 0) * 100) / 100;
   }, [itemizedRows]);
 
   const totalScalePayout = useMemo(() => {
-    return itemizedRows.reduce((acc, row) => acc + (row.subtotal || 0), 0);
+    const sum = itemizedRows.reduce((acc, row) => acc + (row.subtotal || 0), 0);
+    return Math.round(sum * 100) / 100;
   }, [itemizedRows]);
 
   // Handler: Accept Job
@@ -393,77 +408,77 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
   return (
     <div className="mx-auto max-w-xl pb-24 space-y-4">
       {/* Tab Selector Pills */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1">
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar touch-pan-x">
         <button
           type="button"
           onClick={() => onSelectTab('queue')}
-          className={`rounded-full px-3.5 py-2 text-xs font-bold transition-all shrink-0 ${
+          className={`min-h-[44px] rounded-full px-4 py-2.5 text-xs font-bold transition-all shrink-0 active:scale-95 touch-manipulation ${
             tab === 'queue'
               ? 'bg-emerald-700 text-white shadow-xs'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
           }`}
         >
-          Available Pickups ({openJobs.length})
+          {t.collectorAvailablePickups} ({openJobs.length})
         </button>
         <button
           type="button"
           onClick={() => onSelectTab('active')}
-          className={`rounded-full px-3.5 py-2 text-xs font-bold transition-all shrink-0 ${
+          className={`min-h-[44px] rounded-full px-4 py-2.5 text-xs font-bold transition-all shrink-0 active:scale-95 touch-manipulation ${
             tab === 'active'
               ? 'bg-emerald-700 text-white shadow-xs'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
           }`}
         >
-          Scale Weighing {activeJob && '●'}
+          {t.collectorScaleWeighing} {activeJob && '●'}
         </button>
         <button
           type="button"
           onClick={() => onSelectTab('handover')}
-          className={`rounded-full px-3.5 py-2 text-xs font-bold transition-all shrink-0 ${
+          className={`min-h-[44px] rounded-full px-4 py-2.5 text-xs font-bold transition-all shrink-0 active:scale-95 touch-manipulation ${
             tab === 'handover' || (tab as any) === 'earnings'
               ? 'bg-emerald-700 text-white shadow-xs'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
           }`}
         >
-          Earnings & Ledger
+          {t.collectorEarningsLedger}
         </button>
         <button
           type="button"
           onClick={() => onSelectTab('prices')}
-          className={`rounded-full px-3.5 py-2 text-xs font-bold transition-all shrink-0 ${
+          className={`min-h-[44px] rounded-full px-4 py-2.5 text-xs font-bold transition-all shrink-0 active:scale-95 touch-manipulation ${
             tab === 'prices'
               ? 'bg-emerald-700 text-white shadow-xs'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
           }`}
         >
-          Daily Rates
+          {t.collectorDailyRates}
         </button>
         <button
           type="button"
           onClick={() => onSelectTab('safety')}
-          className={`rounded-full px-3.5 py-2 text-xs font-bold transition-all shrink-0 ${
+          className={`min-h-[44px] rounded-full px-4 py-2.5 text-xs font-bold transition-all shrink-0 active:scale-95 touch-manipulation ${
             tab === 'safety'
               ? 'bg-emerald-700 text-white shadow-xs'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
           }`}
         >
-          Safety Guide
+          {t.collectorSafetyGuide}
         </button>
       </div>
 
-      {/* 4 Macro Metrics Overview Cards */}
-      <div className="grid grid-cols-4 gap-2">
+      {/* 4 Macro Metrics Overview Cards - Responsive 2-col on mobile, 4-col on desktop */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
         <button
           type="button"
           id="collector-metric-pickups"
           onClick={() => onSelectTab('queue')}
-          className="rounded-2xl bg-emerald-50/60 p-2.5 text-center border border-emerald-100/80 shadow-2xs hover:bg-emerald-100/80 hover:border-emerald-300 transition-all hover:shadow-xs cursor-pointer focus:outline-hidden"
+          className="min-h-[64px] rounded-2xl bg-emerald-50/80 p-3 text-center border border-emerald-200/90 shadow-2xs hover:bg-emerald-100/90 hover:border-emerald-300 transition-all active:scale-[0.98] cursor-pointer touch-manipulation focus:outline-hidden"
           title="View Pickup Queue"
         >
-          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">
-            Total Pickups
+          <p className="text-[10px] font-black text-slate-500 uppercase tracking-tight">
+            {t.collectorTotalPickups}
           </p>
-          <p className="text-base sm:text-lg font-black text-emerald-700 mt-0.5">
+          <p className="text-lg sm:text-xl font-black text-emerald-800 mt-0.5">
             {macroPickups}
           </p>
         </button>
@@ -472,14 +487,14 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
           type="button"
           id="collector-metric-weight"
           onClick={() => onSelectTab('active')}
-          className="rounded-2xl bg-sky-50/60 p-2.5 text-center border border-sky-100/80 shadow-2xs hover:bg-sky-100/80 hover:border-sky-300 transition-all hover:shadow-xs cursor-pointer focus:outline-hidden"
+          className="min-h-[64px] rounded-2xl bg-sky-50/80 p-3 text-center border border-sky-200/90 shadow-2xs hover:bg-sky-100/90 hover:border-sky-300 transition-all active:scale-[0.98] cursor-pointer touch-manipulation focus:outline-hidden"
           title="Open Scale Weighing"
         >
-          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">
-            Total Weight
+          <p className="text-[10px] font-black text-slate-500 uppercase tracking-tight">
+            {t.collectorTotalWeight}
           </p>
-          <p className="text-base sm:text-lg font-black text-sky-700 mt-0.5">
-            {macroWeight} kg
+          <p className="text-lg sm:text-xl font-black text-sky-800 mt-0.5">
+            {macroWeight} {t.kg}
           </p>
         </button>
 
@@ -487,13 +502,13 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
           type="button"
           id="collector-metric-payout"
           onClick={() => onSelectTab('handover')}
-          className="rounded-2xl bg-purple-50/60 p-2.5 text-center border border-purple-100/80 shadow-2xs hover:bg-purple-100/80 hover:border-purple-300 transition-all hover:shadow-xs cursor-pointer focus:outline-hidden"
+          className="min-h-[64px] rounded-2xl bg-purple-50/80 p-3 text-center border border-purple-200/90 shadow-2xs hover:bg-purple-100/90 hover:border-purple-300 transition-all active:scale-[0.98] cursor-pointer touch-manipulation focus:outline-hidden"
           title="View Earnings & Ledger"
         >
-          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">
-            Total Payout
+          <p className="text-[10px] font-black text-slate-500 uppercase tracking-tight">
+            {t.collectorTotalPayout}
           </p>
-          <p className="text-base sm:text-lg font-black text-purple-700 mt-0.5">
+          <p className="text-lg sm:text-xl font-black text-purple-800 mt-0.5">
             ₹{macroPayout.toLocaleString('en-IN')}
           </p>
         </button>
@@ -502,13 +517,13 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
           type="button"
           id="collector-metric-co2"
           onClick={() => onSelectTab('handover')}
-          className="rounded-2xl bg-emerald-50/60 p-2.5 text-center border border-emerald-100/80 shadow-2xs hover:bg-emerald-100/80 hover:border-emerald-300 transition-all hover:shadow-xs cursor-pointer focus:outline-hidden"
+          className="min-h-[64px] rounded-2xl bg-emerald-50/80 p-3 text-center border border-emerald-200/90 shadow-2xs hover:bg-emerald-100/90 hover:border-emerald-300 transition-all active:scale-[0.98] cursor-pointer touch-manipulation focus:outline-hidden"
           title="View Environmental Impact"
         >
-          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">
-            CO2 Saved
+          <p className="text-[10px] font-black text-slate-500 uppercase tracking-tight">
+            {t.collectorCo2Saved}
           </p>
-          <p className="text-base sm:text-lg font-black text-emerald-700 mt-0.5">
+          <p className="text-lg sm:text-xl font-black text-emerald-800 mt-0.5">
             ~ {macroCo2 || '1.2'} t
           </p>
         </button>
@@ -520,9 +535,9 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
           <div className="flex items-center gap-3">
             <CheckCircle2 className="h-6 w-6" />
             <div>
-              <p className="text-sm font-bold">Cash Payment Complete & Logged!</p>
+              <p className="text-sm font-bold">{t.paymentLoggedSuccess}</p>
               <p className="text-xs text-emerald-100">
-                Paid ₹{scaleSuccessAlert.payout} for {scaleSuccessAlert.kg} kg scrap.
+                {t.paidForScrapNote.replace('{payout}', formatINR(scaleSuccessAlert.payout, true)).replace('{kg}', scaleSuccessAlert.kg.toFixed(2))}
               </p>
             </div>
           </div>
@@ -531,7 +546,7 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
             onClick={() => setScaleSuccessAlert(null)}
             className="rounded-xl bg-white/20 px-3 py-1.5 text-xs font-bold hover:bg-white/30"
           >
-            Done
+            {t.done}
           </button>
         </div>
       )}
@@ -547,12 +562,12 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search by address, material or order ID..."
+                placeholder={t.searchQueuePlaceholder}
                 className="w-full text-xs text-slate-800 focus:outline-none"
               />
             </div>
             <span className="rounded-xl bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-700">
-              All
+              {t.allFilter}
             </span>
           </div>
 
@@ -561,14 +576,21 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
             {filteredJobs.length === 0 ? (
               <div className="rounded-3xl bg-white p-8 text-center border border-slate-100">
                 <Truck className="mx-auto h-10 w-10 text-slate-300" />
-                <p className="mt-2 text-sm font-bold text-slate-800">No Open Jobs In Queue</p>
+                <p className="mt-2 text-sm font-bold text-slate-800">{t.queueEmptyTitle}</p>
                 <p className="text-xs text-slate-500 mt-1">
-                  All neighborhood scrap requests have been accepted.
+                  {t.queueEmptyDesc}
                 </p>
               </div>
             ) : (
               filteredJobs.map((job) => {
-                const materialsSummary = job.materials.map((m) => m.label).join(' + ');
+                const materialsSummary = job.materials
+                  .map((m) => {
+                    const catalogItem = materialCatalog.find((c) => c.key === m.key);
+                    if (language === 'bn' && catalogItem?.labelBn) return catalogItem.labelBn;
+                    if (language === 'hi' && catalogItem?.labelHi) return catalogItem.labelHi;
+                    return m.label;
+                  })
+                  .join(' + ');
                 const totalEstimatedKg = job.estimatedKg || 10;
                 const estPayout = job.payout || 120;
 
@@ -583,24 +605,24 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
                         #{job.id}
                       </span>
                       <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-bold text-amber-800">
-                        Available Job
+                        {t.availableJobBadge}
                       </span>
                     </div>
 
                     {/* Materials & Location */}
                     <div className="mt-2">
                       <h4 className="text-sm font-bold text-slate-900 leading-snug">
-                        {materialsSummary || 'Mixed Scrap Materials'}
+                        {materialsSummary || t.mixedScrapMaterials}
                       </h4>
                       <div className="mt-1 flex items-center gap-1.5 text-xs text-slate-500">
                         <MapPin className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                         <span>{job.address}</span>
                       </div>
                       <div className="mt-0.5 flex items-center gap-2 text-xs text-slate-600 font-medium">
-                        <span>Resident: {job.userName}</span>
+                        <span>{t.residentLabel}: {job.userName}</span>
                         <span>·</span>
                         <span className="font-bold text-emerald-700">
-                          ~{totalEstimatedKg} kg (₹{estPayout})
+                          ~{totalEstimatedKg} {t.kg} (₹{estPayout})
                         </span>
                       </div>
                     </div>
@@ -609,16 +631,16 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
                     <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-3">
                       <div className="flex items-center gap-1 text-xs text-slate-500">
                         <Clock className="h-3.5 w-3.5 text-slate-400" />
-                        <span>{job.slot || 'Today'}</span>
+                        <span>{job.slot || t.todaySlot}</span>
                       </div>
 
                       <button
                         type="button"
                         onClick={() => handleAcceptJob(job)}
-                        className="flex items-center gap-1 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-emerald-700 transition-colors"
+                        className="min-h-[44px] flex items-center gap-1.5 rounded-xl bg-emerald-600 px-5 py-2.5 text-xs font-black text-white shadow-xs hover:bg-emerald-700 active:scale-95 transition-all touch-manipulation"
                       >
-                        <span>Accept Job</span>
-                        <ChevronRight className="h-4 w-4" />
+                        <span>{t.acceptJobBtn}</span>
+                        <ChevronRight className="h-4 w-4 stroke-[2.5]" />
                       </button>
                     </div>
                   </div>
@@ -631,20 +653,20 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
 
       {/* TAB 2: ACTIVE SCALE WEIGHING CALCULATOR */}
       {tab === 'active' && (
-        <div className="rounded-3xl bg-white p-4 sm:p-5 border border-slate-100 shadow-xs space-y-4">
+        <div className="rounded-3xl bg-white p-4 sm:p-5 border border-slate-200/80 shadow-xs space-y-4">
           {!activeJob ? (
             <div className="py-8 text-center">
               <Scale className="mx-auto h-10 w-10 text-slate-300" />
-              <p className="mt-2 text-sm font-bold text-slate-800">No Active Job In Progress</p>
+              <p className="mt-2 text-sm font-bold text-slate-800">{t.scaleNoActiveJob}</p>
               <p className="text-xs text-slate-500 mt-1">
-                Please accept a pickup from the Available Pickups queue.
+                {t.scalePleaseAccept}
               </p>
               <button
                 type="button"
                 onClick={() => onSelectTab('queue')}
-                className="mt-4 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700"
+                className="mt-4 min-h-[44px] rounded-xl bg-emerald-600 px-5 py-2.5 text-xs font-black text-white hover:bg-emerald-700 active:scale-95 transition-all touch-manipulation"
               >
-                View Available Pickups
+                {t.viewQueueBtn}
               </button>
             </div>
           ) : (
@@ -663,7 +685,7 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
                           : 'bg-orange-100 text-orange-800'
                       }`}
                     >
-                      {activeJob.status === 'arrived' ? 'At Doorstep' : 'En Route'}
+                      {activeJob.status === 'arrived' ? t.atDoorstepBadge : t.enRouteBadge}
                     </span>
                   </div>
                   <p className="text-xs text-slate-600 mt-0.5 font-medium">
@@ -675,97 +697,156 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
                   <button
                     type="button"
                     onClick={handleMarkArrived}
-                    className="rounded-xl bg-amber-500 px-3 py-1.5 text-xs font-bold text-white hover:bg-amber-600 shadow-2xs"
+                    className="min-h-[44px] rounded-xl bg-amber-500 px-4 py-2 text-xs font-black text-white hover:bg-amber-600 shadow-2xs active:scale-95 transition-all touch-manipulation"
                   >
-                    I Have Arrived
+                    {t.arrivedBtn}
                   </button>
                 )}
               </div>
 
-              {/* Vernacular Audio Readout Button */}
-              <div className="flex items-center justify-between rounded-2xl bg-emerald-50/70 p-3 border border-emerald-100">
-                <div className="flex items-center gap-2 text-xs font-bold text-emerald-900">
-                  <Volume2 className="h-4 w-4 text-emerald-600" />
-                  <span>Audio Scale Readout</span>
+              {/* Vernacular Audio Readout Button & Synchronized Visual Transcript */}
+              <div className="rounded-2xl bg-emerald-50/80 p-3.5 border border-emerald-200 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-xs font-bold text-emerald-950">
+                    <Volume2 className="h-5 w-5 text-emerald-600" />
+                    <span>{t.audioScaleReadoutTitle}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleSpeakScaleReadout}
+                    className={`min-h-[44px] rounded-xl px-4 py-2 text-xs font-black transition-all active:scale-95 touch-manipulation ${
+                      isSpeakingScale
+                        ? 'bg-red-600 text-white animate-pulse'
+                        : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-2xs'
+                    }`}
+                  >
+                    {isSpeakingScale ? t.stopAudio : t.speakSummaryBtn}
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={handleSpeakScaleReadout}
-                  className="rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-700 transition-colors"
-                >
-                  {isSpeakingScale ? 'Stop Audio' : 'Speak Summary'}
-                </button>
+
+                {isSpeakingScale && spokenScaleText && (
+                  <div className="rounded-xl bg-white p-3 border border-emerald-300 shadow-2xs animate-in fade-in slide-in-from-top-1 duration-150">
+                    <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-emerald-700">
+                      <span className="h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
+                      <span>
+                        {language === 'hi'
+                          ? 'लाइव हिंदी ऑडियो व सबटाइटल'
+                          : language === 'bn'
+                          ? 'লাইভ বাংলা অডিও ও ক্যাপশন'
+                          : 'Live Vernacular Audio Broadcast'}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-xs font-bold text-slate-900 leading-relaxed">
+                      {spokenScaleText}
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Itemized Scale Rows */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                    Itemized Digital Scale
+                  <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">
+                    {t.itemizedScaleTitle}
                   </h4>
-                  <span className="text-xs font-bold text-emerald-700">
-                    Total: {totalScaleKg} kg
+                  <span className="text-xs font-black text-emerald-800">
+                    {t.total}: {totalScaleKg.toFixed(2)} {t.kg}
                   </span>
                 </div>
 
-                <div className="space-y-2">
-                  {itemizedRows.map((row, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center justify-between rounded-2xl bg-slate-50 p-3 border border-slate-200/70"
-                    >
-                      <div className="flex-1 pr-2">
-                        <p className="text-xs font-bold text-slate-900 truncate">
-                          {row.label}
-                        </p>
-                        <p className="text-[11px] text-slate-500">
-                          Rate: ₹{row.rate}/kg · Subtotal: <strong className="text-slate-800">₹{row.subtotal}</strong>
-                        </p>
-                      </div>
+                <div className="space-y-2.5">
+                  {itemizedRows.map((row, idx) => {
+                    const catalogItem = materialCatalog.find((c) => c.key === row.key);
+                    const localizedRowLabel =
+                      language === 'bn' && catalogItem?.labelBn
+                        ? catalogItem.labelBn
+                        : language === 'hi' && catalogItem?.labelHi
+                        ? catalogItem.labelHi
+                        : row.label;
 
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => handleItemizedWeightChange(idx, row.kg - 0.5)}
-                          className="flex h-7 w-7 items-center justify-center rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-100"
-                        >
-                          <Minus className="h-3.5 w-3.5" />
-                        </button>
-                        <span className="w-12 text-center text-xs font-black text-slate-900">
-                          {row.kg} kg
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => handleItemizedWeightChange(idx, row.kg + 0.5)}
-                          className="flex h-7 w-7 items-center justify-center rounded-lg bg-white border border-slate-200 text-emerald-700 hover:bg-emerald-50"
-                        >
-                          <Plus className="h-3.5 w-3.5" />
-                        </button>
+                    return (
+                      <div
+                        key={idx}
+                        className="flex flex-col sm:flex-row sm:items-center justify-between rounded-2xl bg-slate-50 p-3.5 border border-slate-200 gap-2.5"
+                      >
+                        <div className="flex-1">
+                          <p className="text-sm font-bold text-slate-900 leading-tight">
+                            {localizedRowLabel}
+                          </p>
+                          <p className="text-xs text-slate-600 mt-0.5">
+                            {t.rate}: ₹{row.rate}/{t.kg} · {t.subtotal}: <strong className="text-emerald-800 font-black">{formatINR(row.subtotal, true)}</strong>
+                          </p>
+                        </div>
+
+                        {/* Stepper + Direct Mobile Numeric Input */}
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleItemizedWeightChange(idx, row.kg - 0.5)}
+                            className="flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-xl bg-white border border-slate-300 text-slate-800 shadow-xs hover:bg-slate-100 active:scale-95 transition-all touch-manipulation"
+                            aria-label={`Decrease ${localizedRowLabel} weight`}
+                          >
+                            <Minus className="h-4 w-4 stroke-[2.5]" />
+                          </button>
+                          
+                          <div className="flex items-center">
+                            <input
+                              type="number"
+                              inputMode="decimal"
+                              step="0.01"
+                              min="0"
+                              value={row.kg === 0 ? '' : row.kg}
+                              placeholder="0.00"
+                              onChange={(e) => {
+                                const val = parseFloat(e.target.value);
+                                handleItemizedWeightChange(idx, isNaN(val) ? 0 : val);
+                              }}
+                              className="w-20 min-h-[44px] text-center font-black text-slate-900 bg-white border border-slate-300 rounded-xl text-sm focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 focus:outline-none"
+                              aria-label={`${localizedRowLabel} weight in ${t.kg}`}
+                            />
+                            <span className="text-xs font-bold text-slate-500 ml-1.5">{t.kg}</span>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => handleItemizedWeightChange(idx, row.kg + 0.5)}
+                            className="flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-xl bg-emerald-600 text-white shadow-xs hover:bg-emerald-700 active:scale-95 transition-all touch-manipulation"
+                            aria-label={`Increase ${localizedRowLabel} weight`}
+                          >
+                            <Plus className="h-4 w-4 stroke-[2.5]" />
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
 
                 {/* Add Extra Material to Scale */}
                 <div className="mt-3 pt-3 border-t border-slate-100">
-                  <p className="text-[11px] font-bold text-slate-500 mb-1.5">
-                    + Add Extra Recyclable Fraction Found On-Site:
+                  <p className="text-xs font-bold text-slate-700 mb-2">
+                    {t.addExtraFraction}
                   </p>
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="flex flex-wrap gap-2">
                     {materialCatalog.map((cat) => {
                       const alreadyAdded = itemizedRows.some((r) => r.key === cat.key);
+                      const catName =
+                        language === 'bn' && cat.labelBn
+                          ? cat.labelBn
+                          : language === 'hi' && cat.labelHi
+                          ? cat.labelHi
+                          : cat.label;
                       return (
                         <button
                           key={cat.key}
                           type="button"
                           onClick={() => handleAddMaterialToScale(cat.key)}
-                          className={`rounded-full px-2.5 py-1 text-[11px] font-bold transition-all ${
+                          className={`min-h-[40px] rounded-full px-3.5 py-2 text-xs font-bold transition-all active:scale-95 touch-manipulation ${
                             alreadyAdded
                               ? 'bg-slate-100 text-slate-400 cursor-default'
-                              : 'bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100'
+                              : 'bg-emerald-50 text-emerald-900 border border-emerald-300 hover:bg-emerald-100'
                           }`}
                         >
-                          + {cat.label} (₹{cat.rate}/kg)
+                          + {catName} (₹{cat.rate}/{t.kg})
                         </button>
                       );
                     })}
@@ -774,59 +855,62 @@ export const CollectorPortal: React.FC<CollectorPortalProps> = ({
               </div>
 
               {/* Resident OTP Verification */}
-              <div className="rounded-2xl border border-slate-200 p-3.5 space-y-2">
+              <div className="rounded-2xl border border-slate-200 p-4 space-y-2.5 bg-slate-50/50">
                 <div className="flex items-center justify-between">
                   <label className="block text-xs font-bold text-slate-800">
-                    Resident 4-Digit Security PIN
+                    {t.residentOtp}
                   </label>
-                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                    Required to Complete Handover
+                  <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                    {t.requiredToCompleteHandover}
                   </span>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <KeyRound className="h-4 w-4 text-emerald-600 shrink-0" />
+                  <KeyRound className="h-5 w-5 text-emerald-600 shrink-0" />
                   <input
                     type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     maxLength={4}
                     value={enteredOtp}
                     onChange={(e) => setEnteredOtp(e.target.value.replace(/\D/g, ''))}
-                    placeholder="Ask resident for PIN (e.g. 4192)"
-                    className="w-full rounded-xl border border-slate-200 p-2 text-sm font-mono tracking-widest text-center font-bold focus:border-emerald-600 focus:outline-none"
+                    placeholder="••••"
+                    className="w-full min-h-[52px] rounded-2xl border-2 border-slate-300 p-3 text-2xl font-mono tracking-[0.4em] text-center font-black text-slate-900 bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 focus:outline-none"
+                    aria-label="Enter resident 4-digit PIN"
                   />
                 </div>
 
                 {activeJob.verificationOtp && (
-                  <p className="text-[11px] text-slate-500">
-                    💡 Resident security check: Enter resident's 4-digit code (
-                    <span className="font-mono font-bold text-emerald-700 bg-emerald-50 px-1 py-0.5 rounded-md border border-emerald-200">
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    💡 {t.residentSecurityCheckTip} (
+                    <span className="font-mono font-black text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded-md border border-emerald-200">
                       {activeJob.verificationOtp}
                     </span>
-                    ) displayed on their screen.
+                    )
                   </p>
                 )}
               </div>
 
               {scaleError && (
-                <div className="rounded-xl bg-rose-50 p-2.5 text-xs text-rose-700 border border-rose-200">
+                <div className="rounded-xl bg-rose-50 p-3 text-xs font-bold text-rose-700 border border-rose-200">
                   {scaleError}
                 </div>
               )}
 
               {/* Total & Confirm Button */}
-              <div className="rounded-2xl bg-emerald-50/80 p-4 border border-emerald-100 flex items-center justify-between">
+              <div className="rounded-2xl bg-emerald-50/90 p-4 border border-emerald-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                 <div>
-                  <p className="text-xs text-emerald-800 font-medium">Total Payout to Resident</p>
-                  <p className="text-xl font-black text-emerald-900">₹ {totalScalePayout}</p>
+                  <p className="text-xs text-emerald-800 font-bold uppercase tracking-wider">{t.totalPayoutToResident}</p>
+                  <p className="text-2xl font-black text-emerald-950">{formatINR(totalScalePayout, true)}</p>
                 </div>
 
                 <button
                   type="button"
                   onClick={handleConfirmScaleAndCash}
-                  className="flex items-center gap-1.5 rounded-xl bg-emerald-600 px-5 py-3 text-xs font-bold text-white shadow-md hover:bg-emerald-700 transition-colors"
+                  className="min-h-[50px] flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-6 py-3.5 text-sm font-black text-white shadow-md hover:bg-emerald-700 active:scale-[0.98] transition-all touch-manipulation"
                 >
-                  <CheckCircle2 className="h-4 w-4" />
-                  <span>Confirm Cash Payout</span>
+                  <CheckCircle2 className="h-5 w-5 stroke-[2.3]" />
+                  <span>{t.confirmCashPayoutBtn}</span>
                 </button>
               </div>
             </div>

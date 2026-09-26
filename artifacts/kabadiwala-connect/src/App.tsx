@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { EnterpriseHeader } from './components/EnterpriseHeader';
 import { EnterpriseFooter } from './components/EnterpriseFooter';
+import { VernacularLiveAudioBar } from './components/VernacularLiveAudioBar';
 import { LoginView } from './components/LoginView';
 import { HouseholdPortal } from './components/HouseholdPortal';
 import { CollectorPortal } from './components/CollectorPortal';
@@ -137,11 +138,11 @@ export function App() {
         language={language}
         onLanguageChange={handleLanguageChange}
         currentView={currentView}
-        onNavigateView={setCurrentView}
+        onSelectSubTab={handleSelectSubTab}
       />
 
       {/* Main Viewport */}
-      <main className="mx-auto w-full max-w-5xl flex-1 px-3 py-4 sm:px-6 sm:py-6">
+      <main className={`mx-auto w-full max-w-5xl flex-1 px-3 py-4 sm:px-6 sm:py-6 ${currentView !== 'login' ? 'pb-28 md:pb-8' : 'pb-6'}`}>
         {currentView === 'login' && (
           <LoginView
             onLogin={handleLogin}
@@ -200,10 +201,14 @@ export function App() {
         activeTab={activeSubTab}
         onSelectTab={handleSelectSubTab}
         authUser={authUser}
+        language={language}
       />
 
       {/* Clean Minimal Enterprise Footer */}
-      {currentView === 'login' && <EnterpriseFooter />}
+      {currentView === 'login' && <EnterpriseFooter language={language} />}
+
+      {/* Global Synchronized Live Vernacular Audio & Caption Player */}
+      <VernacularLiveAudioBar />
     </div>
   );
 }

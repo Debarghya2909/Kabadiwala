@@ -25,7 +25,6 @@ export const materialCatalog: MaterialLine[] = [
     label: 'Printed Circuit Boards (PCBs & Motherboards)',
     labelHi: 'सर्किट बोर्ड व मदरबोर्ड (PCBs)',
     labelBn: 'প্রিন্টেড সার্কিট বোর্ড ও মাদারবোর্ড (PCBs)',
-    labelMr: 'सर्किट बोर्ड आणि मदरबोर्ड (PCBs)',
     short: 'PCBs',
     rate: 285,
     kg: 2,
@@ -34,7 +33,6 @@ export const materialCatalog: MaterialLine[] = [
     description: 'Computer motherboards, green RAM chips, telecom telecom cards, TV boards',
     descriptionHi: 'कंप्यूटर मदरबोर्ड, रैम चिप्स, टीवी किट और ग्रीन सर्किट बोर्ड',
     descriptionBn: 'কম্পিউটার মাদারবোর্ড, র‍্যাম চিপ, টিভি সার্কিট ও টেলিযোগাযোগ কার্ড',
-    descriptionMr: 'संगणक मदरबोर्ड, रॅम चिप्स, टेलिकॉम सर्किट्स व हिरवे बोर्ड',
     marketRange: '₹260 – ₹310 / kg',
     trend: 'up',
     trendPercent: '+6.5%',
@@ -45,7 +43,6 @@ export const materialCatalog: MaterialLine[] = [
     label: 'Copper Cables & Insulated Wiring',
     labelHi: 'तांबे की केबल व बिजली के तार',
     labelBn: 'তামার তার ও বিদ্যুতের কেব্‌ল',
-    labelMr: 'तांब्याची केबल आणि वायरिंग',
     short: 'Cables',
     rate: 220,
     kg: 3,
@@ -54,7 +51,6 @@ export const materialCatalog: MaterialLine[] = [
     description: 'PVC coated wiring, power cords, data cables, telecom copper pairs',
     descriptionHi: 'बिजली के तार, पावर केबल्स और इंसुलेटेड तांबे के तार',
     descriptionBn: 'পিভিসি কোটিং তার, পাওয়ার কর্ড, ডেটা কেবল এবং তামার ওয়্যারিং',
-    descriptionMr: 'विद्युत तारा, डेटा केबल्स आणि कॉपर वायर',
     marketRange: '₹205 – ₹235 / kg',
     trend: 'up',
     trendPercent: '+4.2%',
@@ -65,7 +61,6 @@ export const materialCatalog: MaterialLine[] = [
     label: 'Batteries (Lithium-ion / Lead-Acid / UPS)',
     labelHi: 'बैटरियां (लिथियम-आयन व यूपीएस)',
     labelBn: 'ব্যাটারি (লিথিয়াম-আয়ন, লেড-অ্যাসিড ও ইউপিএস)',
-    labelMr: 'बॅटरी (लिथियम-आयन व लेड-ॲसिड)',
     short: 'Batteries',
     rate: 95,
     kg: 2,
@@ -74,7 +69,6 @@ export const materialCatalog: MaterialLine[] = [
     description: 'Smartphone Li-ion packs, laptop batteries, inverter lead-acid blocks, UPS units',
     descriptionHi: 'मोबाइल व लैपटॉप की बैटरी, इनवर्टर व यूपीएस बैटरी ब्लॉक',
     descriptionBn: 'মোবাইল ও ল্যাপটপ ব্যাটারি, ইউপিএস ও ইনভার্টার ব্যাটারি ব্লক',
-    descriptionMr: 'मोबाईल व लॅपटॉप बॅटरी, युपीएस आणि इन्व्हर्टर बॅटरी',
     marketRange: '₹85 – ₹110 / kg',
     trend: 'up',
     trendPercent: '+8.0%',
@@ -85,7 +79,6 @@ export const materialCatalog: MaterialLine[] = [
     label: 'Cathode Ray Tubes (CRTs / Old Picture Tubes)',
     labelHi: 'सीआरटी पिक्चर ट्यूब (पुराने टीवी/मॉनिटर)',
     labelBn: 'সিআরটি পিকচার টিউব (পুরনো টিভি/মনিটর)',
-    labelMr: 'सीआरटी पिक्चर ट्यूब (जुने टीव्ही/मॉनिटर)',
     short: 'CRTs',
     rate: 26,
     kg: 0,
@@ -94,7 +87,6 @@ export const materialCatalog: MaterialLine[] = [
     description: 'Heavy glass bulbs from box TVs, computer monitors containing leaded funnel glass',
     descriptionHi: 'पुराने बक्से वाले टीवी और कंप्यूटर मॉनिटर का भारी पिक्चर ग्लास',
     descriptionBn: 'পুরনো বক্স টিভি এবং কম্পিউটার মনিটরের ভারী কাচের পিকচার টিউব',
-    descriptionMr: 'जुन्या टीव्ही व कॉम्प्युटर मॉनिटरच्या काचेच्या पिक्चर ट्यूब',
     marketRange: '₹22 – ₹30 / kg',
     trend: 'stable',
     trendPercent: '0.0%',
@@ -104,8 +96,7 @@ export const materialCatalog: MaterialLine[] = [
     key: 'lcd',
     label: 'LCD & LED Display Panels',
     labelHi: 'एलसीडी व एलईडी स्क्रीन पैनल्स',
-    labelBn: 'এলসিডি ও এলইডি স্ক্রিন প্যানেল',
-    labelMr: 'एलसीडी आणि एलईडी स्क्रीन पॅनेल्स',
+    labelBn: 'এলসিডি ও এলইডি स्क्रीन প্যানেল',
     short: 'LCD/LED',
     rate: 52,
     kg: 0,
@@ -114,7 +105,6 @@ export const materialCatalog: MaterialLine[] = [
     description: 'Flat screen TV panels, broken laptop displays, desktop computer monitors',
     descriptionHi: 'फ्लैट स्क्रीन टीवी, लैपटॉप की स्क्रीन और डेस्कटॉप मॉनिटर पैनल्स',
     descriptionBn: 'ফ্ল্যাট টিভি স্ক্রিন, ল্যাপটপ ডিসপ্লে ও ডেস্কটপ মনিটর প্যানেল',
-    descriptionMr: 'फ्लॅट स्क्रीन टीव्ही, फुटलेले लॅपटॉप डिस्प्ले व संगणक मॉनिटर्स',
     marketRange: '₹48 – ₹58 / kg',
     trend: 'up',
     trendPercent: '+2.8%',
@@ -125,7 +115,6 @@ export const materialCatalog: MaterialLine[] = [
     label: 'Motors & Magnet-Bearing Assemblies',
     labelHi: 'इलेक्ट्रिक मोटर्स व मैग्नेट असेंबली',
     labelBn: 'বৈদ্যুতিক মোটর ও ম্যাগনেট অ্যাসেম্বলি',
-    labelMr: 'इलेक्ट्रिक मोटर्स आणि मॅग्नेट पार्ट्स',
     short: 'Motors',
     rate: 58,
     kg: 0,
@@ -134,7 +123,6 @@ export const materialCatalog: MaterialLine[] = [
     description: 'Washing machine motors, refrigerator compressor blocks, HDD neodymium magnets',
     descriptionHi: 'फ्रिज कंप्रेसर, वाशिंग मशीन मोटर और हार्ड डिस्क के शक्तिशाली चुंबक',
     descriptionBn: 'ওয়াশিং মেশিন মোটর, ফ্রিজ কম্প্রেসর ও হার্ড ডিস্কের শক্তিশালী চুম্বক',
-    descriptionMr: 'वॉशिंग मशीन मोटर्स, फ्रीज कॉम्प्रेसर आणि हार्ड ड्राईव्ह मॅग्नेट्स',
     marketRange: '₹54 – ₹64 / kg',
     trend: 'stable',
     trendPercent: '+1.5%',
@@ -145,7 +133,6 @@ export const materialCatalog: MaterialLine[] = [
     label: 'Mixed E-Waste Plastics (ABS / HIPS Casings)',
     labelHi: 'ई-कचरा हार्ड प्लास्टिक (ABS / HIPS)',
     labelBn: 'ই-বর্জ্য শক্ত প্লাস্টিক (ABS / HIPS খোলস)',
-    labelMr: 'ई-कचरा कठीण प्लास्टिक (ABS / HIPS)',
     short: 'Plastics',
     rate: 18,
     kg: 0,
@@ -154,7 +141,6 @@ export const materialCatalog: MaterialLine[] = [
     description: 'Printer shells, computer tower bezels, keyboard bodies, appliance plastic covers',
     descriptionHi: 'प्रिंटर, सीपीयू बॉडी, कीबोर्ड और इलेक्ट्रॉनिक्स के बाहरी प्लास्टिक खोल',
     descriptionBn: 'প্রিন্টার কেসিং, সিপিইউ ক্যাবিনেট, কীবোর্ড ও যন্ত্রপাতির প্লাস্টিক বডি',
-    descriptionMr: 'प्रिंटर कव्हर, संगणक बॉडी, कीबोर्ड आणि उपकरणांचे प्लास्टिक आवरण',
     marketRange: '₹16 – ₹22 / kg',
     trend: 'down',
     trendPercent: '-2.1%',
@@ -165,7 +151,6 @@ export const materialCatalog: MaterialLine[] = [
     label: 'Scrap Iron & Structural Steel',
     labelHi: 'लोहा स्क्रैप व स्टील सरिया',
     labelBn: 'লোহার স্ক্র্যাপ ও স্ট্রাকচারাল স্টিল',
-    labelMr: 'लोखंड भंगार व स्टील',
     short: 'Iron',
     rate: 34,
     kg: 4,
@@ -174,7 +159,6 @@ export const materialCatalog: MaterialLine[] = [
     description: 'Computer casing frames, metallic racks, appliance chasses, steel brackets',
     descriptionHi: 'कंप्यूटर कैबिनेट, लोहे के एंगल, मशीन के पुर्जे व ग्रिल',
     descriptionBn: 'কম্পিউটার ক্যাবিনেট, ধাতব ফ্রেম, রড ও যন্ত্রপাতির লোহার অংশ',
-    descriptionMr: 'संगणक कॅबिनेट, अँगल रॉड्स, मशिनचे सुटे भाग व लोखंडी पत्रे',
     marketRange: '₹32 – ₹37 / kg',
     trend: 'up',
     trendPercent: '+3.1%',
@@ -184,7 +168,6 @@ export const materialCatalog: MaterialLine[] = [
     label: 'Corrugated Cardboard (Gatta Packaging)',
     labelHi: 'पैकिंग का गत्ता (कार्टन बॉक्स)',
     labelBn: 'প্যাকেজিং কার্টন ও পিচবোর্ড (গাটা)',
-    labelMr: 'पुठ्ठा आणि खोके (कार्टन बॉक्स)',
     short: 'Cardboard',
     rate: 14,
     kg: 5,
@@ -193,7 +176,6 @@ export const materialCatalog: MaterialLine[] = [
     description: 'Clean shipping boxes, appliance packing cartons, unsoiled cardboard sheets',
     descriptionHi: 'साफ डिलीवरी बॉक्स, टीवी पैकिंग के गत्ते व सूखी कार्टन शीट',
     descriptionBn: 'ডেলিভারি বক্স, যন্ত্রপাতির প্যাকিং কার্টন ও শুকনো পিচবোর্ড শিট',
-    descriptionMr: 'स्वच्छ पार्सल बॉक्स, टीव्ही पॅकिंग पुठ्ठे व कोरडे कार्टन',
     marketRange: '₹12 – ₹16 / kg',
     trend: 'stable',
     trendPercent: '0.0%',
@@ -203,7 +185,6 @@ export const materialCatalog: MaterialLine[] = [
     label: 'Old Newspapers & Office Paper (Raddi)',
     labelHi: 'रद्दी अखबार व सफेद कागजात',
     labelBn: 'পুরনো খবরের কাগজ ও অফিস পেপার (রদ্দি)',
-    labelMr: 'जुनी वर्तमानपत्रे व कागद (रद्दी)',
     short: 'Paper',
     rate: 16,
     kg: 6,
@@ -212,7 +193,6 @@ export const materialCatalog: MaterialLine[] = [
     description: 'Bundled daily broadsheets, magazines, office reports, textbooks',
     descriptionHi: 'अखबार के बंडल, मैगजीन, दफ्तरी दस्तावेज और कॉपियां',
     descriptionBn: 'দৈনিক সংবাদপত্র, ম্যাগাজিন, পুরোনো বই ও অফিসের কাগজের বান্ডিল',
-    descriptionMr: 'वर्तमानपत्रांचे बंडल, मासिके, वह्या आणि कार्यालयीन कागदपत्रे',
     marketRange: '₹15 – ₹18 / kg',
     trend: 'up',
     trendPercent: '+1.8%',
@@ -222,7 +202,6 @@ export const materialCatalog: MaterialLine[] = [
     label: 'Glass Bottles, Jars & Culinary Glass',
     labelHi: 'कांच की बोतलें व शीशे का सामान',
     labelBn: 'কাঁচের বোতল, বয়াম ও পরিষ্কার কাচ',
-    labelMr: 'काचेच्या बाटल्या आणि भांडी',
     short: 'Glass',
     rate: 6,
     kg: 5,
@@ -231,7 +210,6 @@ export const materialCatalog: MaterialLine[] = [
     description: 'Cullet glass, intact beverage bottles, culinary glassware, medicine vials',
     descriptionHi: 'पेय पदार्थों की बोतलें, कांच के जार, दवाई की शीशियां',
     descriptionBn: 'অক্ষত পানীয়ের বোতল, কাচের জার ও পরিষ্কার বোতল',
-    descriptionMr: 'काचेच्या बाटल्या, जार आणि बरण्या',
     marketRange: '₹4 – ₹7 / kg',
     trend: 'stable',
     trendPercent: '0.0%',
@@ -242,7 +220,6 @@ export const materialCatalog: MaterialLine[] = [
     label: 'Segregated Kitchen & Organic Wet Waste',
     labelHi: 'अलग किया हुआ गीला / रसोई का जैविक कचरा',
     labelBn: 'আলাদা করা ভেজা রান্নাঘরের জৈব বর্জ্য',
-    labelMr: 'स्वयंपाकघरातील ओला सेंद्रिय कचरा',
     short: 'Wet Waste',
     rate: 2,
     kg: 8,
@@ -251,7 +228,6 @@ export const materialCatalog: MaterialLine[] = [
     description: 'Segregated vegetable peels, fruit scrap, compostable leftovers for local biomethanation',
     descriptionHi: 'सब्जी के छिलके, फलों के अवशेष और रसोई का खाद योग्य कचरा (बायोगैस व कम्पोस्टिंग हेतु)',
     descriptionBn: 'সবজির খোসা, ফল ও খাবারের অবশিষ্টাংশ যা স্থানীয় বায়োগ্যাস ও কম্পোস্টিংয়ের জন্য উপযোগী',
-    descriptionMr: 'भाजीपाल्याची साले, फळे व अन्न कचरा (बायोगॅस व खतासाठी)',
     marketRange: '₹2 / kg (Swachh Segregation Bonus)',
     trend: 'stable',
     trendPercent: '+50 pts',
@@ -265,39 +241,30 @@ export const safetyGuides: SafetyGuideItem[] = [
     title: 'Stop Open-Air Cable Burning',
     titleHi: 'केबलों को खुले में जलाना बंद करें',
     titleBn: 'খোলা জায়গায় তার ও কেব্‌ল পোড়ানো সম্পূর্ণ বন্ধ করুন',
-    titleMr: 'केबल्स व तारा उघड्यावर जाळणे पूर्णपणे थांबवा',
     dangerDescription:
       'Burning insulated cables releases toxic dioxins, furans, and black soot. Inhaling these causes permanent lung damage and cancer. Burning also oxidizes copper, reducing its weight and market purity by up to 35%.',
     dangerDescriptionHi:
       'तारों को जलाने से जहरीला डाइऑक्सिन धुआं निकलता है जो फेफड़ों को भारी नुकसान पहुंचाता है। आग से तांबा जलकर काला हो जाता है और उसका वजन व कीमत 35% तक घट जाती है।',
     dangerDescriptionBn:
       'কেব্‌ল পোড়ালে অত্যন্ত বিষাক্ত ডাইঅক্সিন ধোঁয়া নির্গত হয় যা ফুসফুসের মারাত্মক ক্ষতি করে। আগুনে তামা পুড়ে কালো হয়ে যায় এবং এর ওজন ও বাজারমূল্য ৩৫% পর্যন্ত কমে যায়।',
-    dangerDescriptionMr:
-      'वायर जाळल्याने अत्यंत विषारी धूर हवेत पसरतो, ज्यामुळे फुप्फुसांचे गंभीर आजार होतात. शिवाय तांबे जळून काळे पडल्याने त्याचे वजन आणि बाजारातील भाव ३५% टक्क्यांनी कमी होतो.',
     safePractice:
       'Use hand cable-stripping tools or sell intact cables directly to authorized recyclers who operate automated mechanical cable granulators.',
     safePracticeHi:
       'हाथ से तार छीलने वाले कटर का उपयोग करें या सीधे अधिकृत रीसाइक्लर को बिना जलाए सौंपें जो मशीनी कटर से पूरा शुद्ध तांबा निकालते हैं।',
     safePracticeBn:
       'হাতে তার ছিলার স্ট্রিপার টুল ব্যবহার করুন অথবা অক্ষত তার সরাসরি অনুমোদিত রিসাইক্লিং হাবে বিক্রি করুন যেখানে আধুনিক মেশিনে খাঁটি তামা আলাদা করা হয়।',
-    safePracticeMr:
-      'हात-कटरने वायर सोला किंवा अधिकृत रीसायकलर्सना थेट अखंड केबल द्या, जिथे अत्याधुनिक मशिनने स्वच्छ तांबे वेगळे केले जाते.',
     economicBenefit:
       'Earn ₹220/kg for intact copper cables at authorized hub vs only ₹160/kg for soot-damaged burnt copper.',
     economicBenefitHi:
       'अधिकृत केंद्र पर स्वच्छ केबल का ₹220/किग्रा मिलता है, जबकि जलाए हुए तांबे का सिर्फ ₹160/किग्रा ही मिल पाता है।',
     economicBenefitBn:
       'অনুমোদিত হাবে অক্ষত তামার তারে প্রতি কেজি ₹২২০ পান, যেখানে পোড়ানো ক্ষতিগ্রস্ত তামার দাম নেমে যায় মাত্র ₹১৬০-এ।',
-    economicBenefitMr:
-      'अधिकृत केंद्रावर अखंड केबलला ₹२२०/कि.ग्रॅ. मिळतात, तर जाळलेल्या खराब तांब्याला केवळ ₹१६०/कि.ग्रॅ. मिळतात.',
     audioSpeechText:
       'Warning: Do not burn cables. It creates cancer-causing smoke and reduces your copper profits. Sell intact cables directly to authorized recyclers.',
     audioSpeechTextHi:
       'सावधान: केबलों को कभी न जलाएं। इससे जहरीला धुआं निकलता है और तांबे का दाम भी कम हो जाता है। साफ केबल अधिकृत रीसाइक्लर को बेचें।',
     audioSpeechTextBn:
       'সতর্কতা: তার কখনই পোড়াবেন না। এতে বিষাক্ত ধোঁয়ায় রোগ হয় এবং তামার দাম কমে যায়। পরিষ্কার তার সরাসরি অনুমোদিত রিসাইকলারকে বিক্রি করুন।',
-    audioSpeechTextMr:
-      'सावधान: वायर कधीही जाळू नका. त्यामुळे विषारी धूर होतो आणि तांब्याची किंमत घटते. अधिकृत केंद्रात स्वच्छ केबल विकून अधिक नफा मिळवा.',
     iconName: 'Flame',
     severity: 'critical',
   },
@@ -306,39 +273,30 @@ export const safetyGuides: SafetyGuideItem[] = [
     title: 'Eliminate Backyard Acid Leaching of PCBs',
     titleHi: 'सर्किट बोर्ड्स (PCBs) पर एसिड डालना बंद करें',
     titleBn: 'সার্কিট বোর্ডে বিপজ্জনক অ্যাসিড ঢালা বন্ধ করুন',
-    titleMr: 'सर्किट बोर्ड्सवर ॲसिड वापरणे टाळा',
     dangerDescription:
       'Dunking motherboards into nitric acid or cyanide baths causes severe chemical burns, blindness, and lethal toxic gas plumes. Informal acid dumps poison ground soil and local water wells.',
     dangerDescriptionHi:
       'मदरबोर्ड से सोना निकालने के लिए तेजाब का उपयोग करना बेहद जानलेवा है। इससे आंखों की रोशनी जा सकती है और जहरीली गैस से दम घुट सकता है।',
     dangerDescriptionBn:
       'মাদারবোর্ড অ্যাসিডে ভিজিয়ে সোনা আলাদা করতে গেলে রাসায়নিক পোড়া, অন্ধত্ব এবং বিষাক্ত গ্যাসের প্রাণঘাতী ঝুঁকি থাকে। এছাড়া ভূগর্ভস্থ পানি ও মাটি দূষিত হয়।',
-    dangerDescriptionMr:
-      'मदरबोर्डमधून सोने किंवा धातू काढण्यासाठी ॲसिड वापरल्याने हात भाजणे, अंधत्व आणि विषारी वायूचा धोका संभवतो. हा कचरा पाणी आणि जमीन दूषित करतो.',
     safePractice:
       'Store intact circuit boards in dry plastic crates. Authorized hydrometallurgical facilities extract 99% gold, palladium, copper, and tin in closed-loop systems with certified safety.',
     safePracticeHi:
       'सर्किट बोर्ड्स को सूखा रखें और बिना तोड़े अधिकृत रीसाइक्लर को दें। आधुनिक कारखानों में सुरक्षित तरीके से पूरा कीमती धातु निकाला जाता है।',
     safePracticeBn:
       'সার্কিট বোর্ড না ভেঙে শুকনো প্লাস্টিকের ক্রেটে রাখুন। অনুমোদিত রিসাইকলাররা নিয়ন্ত্রিত আধুনিক প্রক্রিয়ায় নিরাপদে ৯৯% মূল্যবান ধাতু উদ্ধার করে।',
-    safePracticeMr:
-      'सर्किट बोर्ड्स न तोडता कोरड्या क्रेटमध्ये साठवा. अधिकृत रिसायकलिंग प्लांट्स आधुनिक तंत्रज्ञानाने सुरक्षितपणे मौल्यवान धातू वेगळे करतात.',
     economicBenefit:
       'CPCB authorized recyclers pay ₹285/kg upfront without you spending money on hazardous acid barrels.',
     economicBenefitHi:
       'अधिकृत रीसाइक्लर ₹285/किग्रा का तुरंत नकद भुगतान करते हैं और आपको तेजाब खरीदने पर फालतू खर्च नहीं करना पड़ता।',
     economicBenefitBn:
       'অনুমোদিত রিসাইকলার সরাসরি প্রতি কেজিতে ₹২৮৫ নগদ পরিশোধ করে এবং অ্যাসিড কেনার বাড়তি খরচও বাঁচে।',
-    economicBenefitMr:
-      'अधिकृत रीसायकलर्स रोख ₹२८५/कि.ग्रॅ. दर देतात, आणि घातक ॲसिड खरेदीचा खर्चही वाचतो.',
     audioSpeechText:
       'Caution: Never use acid on circuit boards. It causes blindness and toxic poisoning. Hand over intact boards to authorized e-waste recyclers for top prices.',
     audioSpeechTextHi:
       'सावधानी: सर्किट बोर्ड पर कभी तेजाब न डालें। यह अंधापन और फेफड़ों की बीमारी करता है। इसे सीधे अधिकृत ई-कचरा रीसाइक्लर को दें।',
     audioSpeechTextBn:
       'সাবধান: সার্কিট বোর্ডে কখনও অ্যাসিড দেবেন না। এটি অন্ধত্ব ও বিষাক্ত গ্যাসের কারণ। অক্ষত সার্কিট বোর্ড অনুমোদিত ই-বর্জ্য হাবে বিক্রি করে সর্বোচ্চ দর পান।',
-    audioSpeechTextMr:
-      'दक्षता: सर्किट बोर्डवर कधीही ॲसिड टाकू नका. हे डोळ्यांसाठी आणि फुप्फुसांसाठी प्राणघातक आहे. अधिकृत केंद्रात देऊन पूर्ण मोबदला मिळवा.',
     iconName: 'FlaskConical',
     severity: 'critical',
   },
@@ -347,39 +305,30 @@ export const safetyGuides: SafetyGuideItem[] = [
     title: 'Safe Handling of Lithium & Lead Batteries',
     titleHi: 'लिथियम व लेड-एसिड बैटरी की सुरक्षित संभाल',
     titleBn: 'লিথিয়াম ও লেড ব্যাটারির নিরাপদ ব্যবস্থাপনা',
-    titleMr: 'लिथियम व लेड बॅटरी सुरक्षित हाताळणी',
     dangerDescription:
       'Crushing or puncturing smartphone and laptop batteries causes spontaneous thermal runaway explosions and intense chemical fires. Dropping car/inverter batteries causes sulfuric acid chemical burns.',
     dangerDescriptionHi:
       'मोबाइल या लैपटॉप की बैटरी को दबाने या हथौड़े से तोड़ने पर तुरंत भयंकर आग लग सकती है। इनवर्टर बैटरी के तेजाब से त्वचा बुरी तरह जल सकती है।',
     dangerDescriptionBn:
       'মোবাইল বা ল্যাপটপের ব্যাটারি চাপলে বা ফুটো করলে মুহূর্তে রাসায়নিক অগ্নিকাণ্ড ও বিস্ফোরণ ঘটতে পারে। ইনভার্টার ব্যাটারির অ্যাসিড চামড়া পুড়িয়ে দিতে পারে।',
-    dangerDescriptionMr:
-      'मोबाईल किंवा लॅपटॉपच्या बॅटरीवर हातोडा मारल्यास किंवा ती वाकवल्यास स्फोट होऊन आग लागू शकते. मोठ्या बॅटऱ्यांमधील ॲसिड गळतीमुळे कातडी जळू शकते.',
     safePractice:
       'Always tape exposed battery terminals with insulation tape. Store in a dry, ventilated plastic container away from flammable papers or direct sunlight.',
     safePracticeHi:
       'बैटरी के दोनों सिरों पर इंसुलेशन टेप लगाएं। इन्हें धूप और पानी से दूर प्लास्टिक के सूखे बक्से में सुरक्षित रखें।',
     safePracticeBn:
       'ব্যাটারির খোলা প্রান্তগুলোতে ইনসুলেশন টেপ লাগিয়ে রাখুন। রোদ ও আগুন থেকে দূরে শুকনো প্লাস্টিকের বাক্সে রাখুন।',
-    safePracticeMr:
-      'बॅटरीच्या दोन्ही टोकांवर इन्सुलेशन टेप लावा. उष्णता व पावसापासून लांब कोरड्या प्लास्टिकच्या पेटीत साठवा.',
     economicBenefit:
       'Intact, untampered lithium and lead batteries fetch certified EPR rate of ₹95/kg to ₹110/kg.',
     economicBenefitHi:
       'बिना टूटी-फूटी सुरक्षित बैटरियों पर अधिकृत ईपीआर केंद्र ₹95 से ₹110 प्रति किलो का पक्का भाव देते हैं।',
     economicBenefitBn:
       'অক্ষত ও অক্ষুণ্ন ব্যাটারির জন্য অনুমোদিত কেন্দ্র থেকে প্রতি কেজি ₹৯৫ থেকে ₹১১০ পর্যন্ত নিশ্চিত মূল্য পান।',
-    economicBenefitMr:
-      'सुस्थितीतील बॅटरीला अधिकृत केंद्रावर ₹९५ ते ₹११० प्रति किलो खात्रीशीर दर मिळतो.',
     audioSpeechText:
       'Battery alert: Do not crush or hammer batteries. Cover terminals with tape and store in dry bins to prevent explosive fires.',
     audioSpeechTextHi:
       'बैटरी चेतावनी: बैटरी को कभी न तोड़ें और न ही हथौड़ा मारें। सिरों पर टेप लगाएं ताकि आग न लगे।',
     audioSpeechTextBn:
       'ব্যাটারি সতর্কতা: ব্যাটারিতে কখনও হাতুড়ি মারবেন না বা ভাঙবেন না। আগুন প্রতিরোধে মাথায় টেপ লাগিয়ে শুকনো বিনে রাখুন।',
-    audioSpeechTextMr:
-      'बॅटरी सूचना: बॅटरी कधीही आपटू किंवा कापू नका. आगीचा धोका टाळण्यासाठी टोकांवर टेप लावून सुरक्षित ठेवा.',
     iconName: 'BatteryCharging',
     severity: 'high',
   },
@@ -388,39 +337,30 @@ export const safetyGuides: SafetyGuideItem[] = [
     title: 'Prevent CRT Picture Tube Implosion & Lead Release',
     titleHi: 'सीआरटी पिक्चर ट्यूब को टूटने और फूटने से बचाएं',
     titleBn: 'সিআরটি পিকচার টিউবের বিস্ফোরণ ও বিষাক্ত সিসা নির্গমন রোধ করুন',
-    titleMr: 'सीआरटी पिक्चर ट्यूब फुटण्यापासून वाचवा',
     dangerDescription:
       'Smashing the neck of a CRT monitor causes violent vacuum implosion, spraying razor-sharp glass shards up to 10 feet. It also pulverizes 2 to 3 kg of hazardous lead and cadmium phosphor powder.',
     dangerDescriptionHi:
       'पुराने टीवी की पिक्चर ट्यूब को हथौड़े से तोड़ने पर वह वैक्यूम से फट जाती है और कांच दूर तक उड़ता है। इसमें 2 से 3 किलो जहरीला सीसा (Lead) होता है जो सांस में चला जाता है।',
     dangerDescriptionBn:
       'পুরনো টিভি বা মনিটরের পিকচার টিউব ভাঙলে মারাত্মক ভ্যাকুয়াম বিস্ফোরণে ধারালো কাচ চারদিকে ছিটকে যায় এবং ২ থেকে ৩ কেজি বিষাক্ত সিসা ও ফসফর গুঁড়া বাতাসে ছড়িয়ে পড়ে।',
-    dangerDescriptionMr:
-      'सीआरटी काच फोडल्यास व्हॅक्यूममुळे काचेचे तुकडे उडून मोठा अपघात होऊ शकतो. तसेच त्यातील विषारी शिसे (Lead) हवेत मिसळून शरीरास घातक ठरते.',
     safePractice:
       'Transport CRT units with the screen facing flat downward. Never break the glass funnel or neck. Deliver intact to authorized dismantling facilities.',
     safePracticeHi:
       'पिक्चर ट्यूब को कभी न तोड़ें। इसे सीधा या कपड़े पर रखकर अधिकृत डिस्मेंटलिंग सेंटर तक अखंड पहुंचाएं।',
     safePracticeBn:
       'পিকচার টিউব কখনই ভাঙবেন না। স্ক্রিনটি কাপড়ে বা সমতলে শুইয়ে অক্ষত অবস্থায় অনুমোদিত ডিসম্যান্টলিং সুবিধায় পৌঁছে দিন।',
-    safePracticeMr:
-      'पिक्चर ट्यूब कधीही फोडू नका. अखंड स्थितीतच अधिकृत ई-कचरा केंद्रावर सुरक्षितपणे सुपूर्द करा.',
     economicBenefit:
       'Authorized centers accept intact CRT units for compliant recycling at ₹26/kg.',
     economicBenefitHi:
       'साबुत सुरक्षित सीआरटी को अधिकृत केंद्र ₹26 प्रति किलो पर स्वीकार करते हैं।',
     economicBenefitBn:
       'অনুমোদিত কেন্দ্র অক্ষত সিআরটি ইউনিটের জন্য প্রতি কেজিতে ₹২৬ দর দেয়।',
-    economicBenefitMr:
-      'अखंड सीआरटी युनिट्स अधिकृत केंद्रात ₹२६/कि.ग्रॅ. दराने स्वीकारले जातात.',
     audioSpeechText:
       'CRT safety: Never smash CRT glass. It contains toxic lead and can implode with flying glass. Keep picture tubes intact.',
     audioSpeechTextHi:
       'सीआरटी सुरक्षा: पिक्चर ट्यूब को कभी न फोड़ें। इसमें जहरीला सीसा होता है और कांच उड़ने का खतरा रहता है।',
     audioSpeechTextBn:
       'সিআরটি সতর্কতা: পিকচার টিউবের কাচ কখনও ভাঙবেন না। এতে বিষাক্ত সিসা থাকে এবং কাচ ছিটকে আসার ঝুঁকি থাকে। টিউবটি অক্ষত রাখুন।',
-    audioSpeechTextMr:
-      'सीआरटी सुरक्षा: पिक्चर ट्यूब कधीही फोडू नका. त्यात विषारी शिसे असते आणि काच उडण्याचा धोका असतो.',
     iconName: 'Tv2',
     severity: 'high',
   },
@@ -552,12 +492,15 @@ export const defaultRecyclerUser: AuthUser = {
   preferredLanguage: 'en',
 };
 
-export function formatINR(val: number): string {
+export function formatINR(val: number, forceDecimals?: boolean): string {
+  const num = val || 0;
+  const hasDecimals = forceDecimals !== undefined ? forceDecimals : Math.abs(num % 1) > 0.001;
   return new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: 'INR',
-    maximumFractionDigits: 0,
-  }).format(val || 0);
+    minimumFractionDigits: hasDecimals ? 2 : 0,
+    maximumFractionDigits: hasDecimals ? 2 : 0,
+  }).format(num);
 }
 
 export function formatDateShort(dateStr: string): string {
@@ -877,6 +820,61 @@ export const seedPickups: Pickup[] = [
       },
     ],
   },
+  {
+    id: 'KC-1045',
+    userId: 'usr-household-101',
+    userName: 'Deblina Mukherjee',
+    userPhone: '+91 98301 44829',
+    address: 'Flat 3B, Ballygunge Park Road, Ballygunge',
+    area: 'Ballygunge',
+    landmark: 'Near Birla Mandir & Ice Skating Rink',
+    slot: 'Yesterday · 4:00 PM – 5:30 PM',
+    materials: [
+      { key: 'iron', label: 'Scrap Iron & Structural Steel', kg: 14.5, rate: 34 },
+      { key: 'cables', label: 'Copper Cables & Insulated Wiring', kg: 3.0, rate: 220 },
+      { key: 'cardboard', label: 'Corrugated Cardboard (Gatta)', kg: 8.0, rate: 14 },
+    ],
+    estimatedKg: 25.5,
+    finalKg: 25.5,
+    payout: 1265,
+    status: 'completed',
+    collectorId: 'usr-collector-204',
+    collectorName: 'Raju Das',
+    collectorPhone: '+91 98312 77410',
+    collectorVehicle: 'Electric Cargo Trike (WB-02-AK-4192)',
+    verificationOtp: '8319',
+    createdAt: new Date(Date.now() - 28 * 3600 * 1000).toISOString(),
+    acceptedAt: new Date(Date.now() - 27 * 3600 * 1000).toISOString(),
+    arrivedAt: new Date(Date.now() - 26 * 3600 * 1000).toISOString(),
+    completedAt: new Date(Date.now() - 25 * 3600 * 1000).toISOString(),
+    // Unrated initially so households can test providing feedback immediately
+    timeline: [
+      {
+        status: 'pending',
+        title: 'Pickup Request Logged',
+        timestamp: new Date(Date.now() - 28 * 3600 * 1000).toISOString(),
+        note: 'Requested 25.5 kg mixed metal, cable & carton pickup.',
+      },
+      {
+        status: 'accepted',
+        title: 'Collector Assigned',
+        timestamp: new Date(Date.now() - 27 * 3600 * 1000).toISOString(),
+        note: 'Raju Das accepted the route.',
+      },
+      {
+        status: 'arrived',
+        title: 'Arrived at Address',
+        timestamp: new Date(Date.now() - 26 * 3600 * 1000).toISOString(),
+        note: 'Collector arrived with digital scale.',
+      },
+      {
+        status: 'completed',
+        title: 'Weighed & Paid in Cash',
+        timestamp: new Date(Date.now() - 25 * 3600 * 1000).toISOString(),
+        note: 'Weight recorded: 25.5 kg. Payout: ₹1,265 handed over in cash.',
+      },
+    ],
+  },
 ];
 
 export const seedDigitalLots: DigitalLot[] = [
@@ -983,7 +981,18 @@ export function readPickupsFromStorage(): Pickup[] {
       return seedPickups;
     }
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) && parsed.length > 0 ? parsed : seedPickups;
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      if (!parsed.some((p: Pickup) => p.id === 'KC-1045')) {
+        const merged = [
+          ...parsed,
+          ...seedPickups.filter((sp) => !parsed.some((p: Pickup) => p.id === sp.id)),
+        ];
+        localStorage.setItem(STORAGE_KEY_PICKUPS, JSON.stringify(merged));
+        return merged;
+      }
+      return parsed;
+    }
+    return seedPickups;
   } catch {
     return seedPickups;
   }
@@ -1075,7 +1084,7 @@ export function readLanguageFromStorage(): Language {
   if (typeof window === 'undefined') return 'en';
   try {
     const raw = localStorage.getItem(STORAGE_KEY_LANGUAGE);
-    if (raw === 'hi' || raw === 'mr' || raw === 'bn' || raw === 'en') {
+    if (raw === 'hi' || raw === 'bn' || raw === 'en') {
       return raw as Language;
     }
     return 'en';

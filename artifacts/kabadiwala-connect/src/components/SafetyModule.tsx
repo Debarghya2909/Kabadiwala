@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Flame,
   FlaskConical,
@@ -10,44 +10,30 @@ import {
   AlertTriangle,
   CheckCircle2,
   TrendingUp,
-  Info,
 } from 'lucide-react';
 import { Language, SafetyGuideItem } from '../types';
 import { safetyGuides } from '../data/mockData';
-import { getTranslation, speakVernacular, stopVernacularSpeech } from '../lib/i18n';
+import { getTranslation, useVernacularAudio } from '../lib/i18n';
 
 interface SafetyModuleProps {
   language: Language;
 }
 
 export const SafetyModule: React.FC<SafetyModuleProps> = ({ language }) => {
-  const [playingId, setPlayingId] = useState<string | null>(null);
   const t = getTranslation(language);
+  const { isPlaying, activeId, playAudio, stopAudio } = useVernacularAudio();
 
   const handlePlayAudio = (guide: SafetyGuideItem) => {
-    if (playingId === guide.id) {
-      stopVernacularSpeech();
-      setPlayingId(null);
+    if (isPlaying && activeId === guide.id) {
+      stopAudio();
       return;
     }
-
-    stopVernacularSpeech();
-    setPlayingId(guide.id);
 
     let textToSpeak = guide.audioSpeechText;
     if (language === 'hi') textToSpeak = guide.audioSpeechTextHi;
     if (language === 'bn') textToSpeak = guide.audioSpeechTextBn || guide.audioSpeechText;
-    if (language === 'mr') textToSpeak = guide.audioSpeechTextMr || guide.audioSpeechText;
 
-    const started = speakVernacular(textToSpeak, language);
-    if (!started) {
-      setPlayingId(null);
-    }
-
-    // Auto reset play icon after approximate duration
-    setTimeout(() => {
-      setPlayingId((curr) => (curr === guide.id ? null : curr));
-    }, 9000);
+    playAudio(textToSpeak, language, guide.id);
   };
 
   const getIcon = (iconName: string) => {
@@ -85,7 +71,11 @@ export const SafetyModule: React.FC<SafetyModuleProps> = ({ language }) => {
           </div>
 
           <div className="text-xs font-semibold text-red-900 bg-white/80 border border-red-200 px-3 py-1.5 rounded-lg">
-            E-Waste Rules 2022 Compliant
+            {language === 'hi'
+              ? 'ई-कचरा नियम 2022 के अनुरूप'
+              : language === 'bn'
+              ? 'ই-বর্জ্য বিধি ২০২২ অনুযায়ী'
+              : 'E-Waste Rules 2022 Compliant'}
           </div>
         </div>
       </div>
@@ -93,32 +83,26 @@ export const SafetyModule: React.FC<SafetyModuleProps> = ({ language }) => {
       {/* Grid of Safety Cards */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {safetyGuides.map((guide) => {
-          const isPlaying = playingId === guide.id;
+          const isItemPlaying = isPlaying && activeId === guide.id;
           const title =
-            language === 'hi' ? guide.titleHi : language === 'bn' ? (guide.titleBn || guide.title) : language === 'mr' ? guide.titleMr : guide.title;
+            language === 'hi' ? guide.titleHi : language === 'bn' ? (guide.titleBn || guide.title) : guide.title;
           const danger =
             language === 'hi'
               ? guide.dangerDescriptionHi
               : language === 'bn'
               ? (guide.dangerDescriptionBn || guide.dangerDescription)
-              : language === 'mr'
-              ? guide.dangerDescriptionMr
               : guide.dangerDescription;
           const safe =
             language === 'hi'
               ? guide.safePracticeHi
               : language === 'bn'
               ? (guide.safePracticeBn || guide.safePractice)
-              : language === 'mr'
-              ? guide.safePracticeMr
               : guide.safePractice;
           const economic =
             language === 'hi'
               ? guide.economicBenefitHi
               : language === 'bn'
               ? (guide.economicBenefitBn || guide.economicBenefit)
-              : language === 'mr'
-              ? guide.economicBenefitMr
               : guide.economicBenefit;
 
           return (
@@ -138,13 +122,13 @@ export const SafetyModule: React.FC<SafetyModuleProps> = ({ language }) => {
                         {guide.severity === 'critical'
                           ? language === 'hi'
                             ? 'गंभीर खतरा'
-                            : language === 'mr'
-                            ? 'गंभीर धोका'
+                            : language === 'bn'
+                            ? 'মারাত্মক ঝুঁকি'
                             : 'Critical Hazard'
                           : language === 'hi'
                           ? 'सावधानी'
-                          : language === 'mr'
-                          ? 'सावधान'
+                          : language === 'bn'
+                          ? 'সতর্কতা'
                           : 'High Caution'}
                       </span>
                       <h3 className="mt-1 text-base font-bold text-slate-900 leading-snug">
@@ -158,14 +142,14 @@ export const SafetyModule: React.FC<SafetyModuleProps> = ({ language }) => {
                     id={`safety-audio-btn-${guide.id}`}
                     type="button"
                     onClick={() => handlePlayAudio(guide)}
-                    className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold transition-colors ${
-                      isPlaying
+                    className={`min-h-[44px] inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition-all active:scale-95 touch-manipulation ${
+                      isItemPlaying
                         ? 'bg-emerald-600 text-white shadow-xs'
-                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
                     }`}
-                    title={isPlaying ? t.stopAudio : t.listenAudio}
+                    title={isItemPlaying ? t.stopAudio : t.listenAudio}
                   >
-                    {isPlaying ? (
+                    {isItemPlaying ? (
                       <>
                         <VolumeX className="h-4 w-4 animate-pulse" />
                         <span>{t.stopAudio}</span>
@@ -173,7 +157,7 @@ export const SafetyModule: React.FC<SafetyModuleProps> = ({ language }) => {
                     ) : (
                       <>
                         <Volume2 className="h-4 w-4 text-emerald-600" />
-                        <span>{language === 'hi' ? 'ऑडियो सुनें' : language === 'mr' ? 'ऐका' : 'Listen'}</span>
+                        <span>{language === 'hi' ? 'ऑडियो सुनें' : language === 'bn' ? 'অডিও শুনুন' : 'Listen'}</span>
                       </>
                     )}
                   </button>

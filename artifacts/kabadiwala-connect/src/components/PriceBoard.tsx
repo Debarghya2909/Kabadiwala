@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { Language, MaterialLine } from '../types';
 import { materialCatalog, formatINR } from '../data/mockData';
-import { getTranslation, speakVernacular, stopVernacularSpeech } from '../lib/i18n';
+import { getTranslation, useVernacularAudio } from '../lib/i18n';
 
 interface PriceBoardProps {
   language: Language;
@@ -19,8 +19,9 @@ interface PriceBoardProps {
 
 export const PriceBoard: React.FC<PriceBoardProps> = ({ language }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [isSpeaking, setIsSpeaking] = useState(false);
   const t = getTranslation(language);
+  const { isPlaying, activeId, playAudio, stopAudio, text: spokenActiveText } = useVernacularAudio();
+  const isSpeaking = isPlaying && activeId === 'price-board';
 
   const filteredMaterials = materialCatalog.filter((m) => {
     if (selectedCategory === 'all') return true;
@@ -33,36 +34,23 @@ export const PriceBoard: React.FC<PriceBoardProps> = ({ language }) => {
 
   const handleSpeakAllRates = () => {
     if (isSpeaking) {
-      stopVernacularSpeech();
-      setIsSpeaking(false);
+      stopAudio();
       return;
     }
 
-    setIsSpeaking(true);
     let spokenText = '';
-
     if (language === 'hi') {
       spokenText =
         'आज के प्रमुख ई-कचरा व स्क्रैप भाव: सर्किट बोर्ड 285 रुपये किलो. तांबे की केबल 220 रुपये किलो. बैटरियां 95 रुपये किलो. मोटर्स 58 रुपये किलो. एलसीडी पैनल 52 रुपये किलो. लोहा 34 रुपये किलो. गत्ता 14 रुपये किलो.';
     } else if (language === 'bn') {
       spokenText =
         'আজকের প্রধান ই-বর্জ্য ও স্ক্র্যাপের বাজারদর: সার্কিট বোর্ড প্রতি কেজি ২৮৫ টাকা, তামার তার প্রতি কেজি ২২০ টাকা, ব্যাটারি প্রতি কেজি ৯৫ টাকা, মোটর প্রতি কেজি ৫৮ টাকা, এলসিডি প্যানেল প্রতি কেজি ৫২ টাকা, লোহা প্রতি কেজি ৩৪ টাকা, কার্টন ও পিচবোর্ড প্রতি কেজি ১৪ টাকা।';
-    } else if (language === 'mr') {
-      spokenText =
-        'आजचे प्रमुख ई-कचरा व भंगार दर: सर्किट बोर्ड 285 रुपये किलो. तांब्याची केबल 220 रुपये किलो. बॅटरी 95 रुपये किलो. इलेक्ट्रिक मोटर्स 58 रुपये किलो. एलसीडी पॅनेल्स 52 रुपये किलो. लोखंड 34 रुपये किलो. पुठ्ठा 14 रुपये किलो.';
     } else {
       spokenText =
         'Today\'s verified EPR scrap rates: PCBs at 285 rupees per kg. Copper cables at 220 rupees per kg. Batteries at 95 rupees per kg. Motors at 58 rupees per kg. LCD panels at 52 rupees per kg. Iron at 34 rupees per kg. Cardboard at 14 rupees per kg.';
     }
 
-    const ok = speakVernacular(spokenText, language);
-    if (!ok) {
-      setIsSpeaking(false);
-    }
-
-    setTimeout(() => {
-      setIsSpeaking(false);
-    }, 14000);
+    playAudio(spokenText, language, 'price-board');
   };
 
   return (
@@ -72,7 +60,7 @@ export const PriceBoard: React.FC<PriceBoardProps> = ({ language }) => {
         <div>
           <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-700">
             <ShieldCheck className="h-4 w-4" />
-            <span>EPR Benchmark Discovery</span>
+            <span>{language === 'hi' ? 'सीपीसीबी ईपीआर बेंचमार्क दरें' : language === 'bn' ? 'সিপিসিবি ইপিআর বাজারদর অনুসন্ধান' : 'EPR Benchmark Discovery'}</span>
           </div>
           <h2 className="mt-1 text-xl font-extrabold text-slate-900 sm:text-2xl">
             {t.priceBoardTitle}
@@ -87,7 +75,7 @@ export const PriceBoard: React.FC<PriceBoardProps> = ({ language }) => {
           id="listen-price-board-btn"
           type="button"
           onClick={handleSpeakAllRates}
-          className={`inline-flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-bold shadow-xs transition-all ${
+          className={`w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-bold shadow-xs transition-all active:scale-95 touch-manipulation ${
             isSpeaking
               ? 'bg-red-600 text-white animate-pulse'
               : 'bg-emerald-600 text-white hover:bg-emerald-700 focus:ring-2 focus:ring-emerald-500'
@@ -108,23 +96,43 @@ export const PriceBoard: React.FC<PriceBoardProps> = ({ language }) => {
         </button>
       </div>
 
+      {/* Synchronized Visual Text Subtitle Banner for Price Readout */}
+      {isSpeaking && (
+        <div className="rounded-2xl bg-slate-900 text-white p-4 border-2 border-emerald-500 shadow-md animate-in fade-in flex items-start gap-3">
+          <Volume2 className="h-5 w-5 text-emerald-400 shrink-0 mt-0.5 animate-pulse" />
+          <div className="flex-1">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-400">
+                {language === 'hi' ? 'हिंदी ध्वनि वाचन सक्रिय' : language === 'bn' ? 'বাংলা অডিও বার্তা সক্রিয়' : 'Spoken Audio Active'}
+              </span>
+              <span className="text-[11px] text-slate-400">
+                {language === 'hi' ? 'दैनिक भाव सारांश' : language === 'bn' ? 'দৈনিক বাজারদর সারাংশ' : 'Daily Rates Summary'}
+              </span>
+            </div>
+            <p className="mt-1.5 text-sm font-medium text-emerald-50 leading-relaxed font-sans">
+              "{spokenActiveText}"
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Category Pills */}
       <div className="flex flex-wrap gap-2">
         {[
-          { id: 'all', label: language === 'hi' ? 'सभी सामग्रियां' : language === 'mr' ? 'सर्व वस्तू' : 'All Categories' },
-          { id: 'ewaste', label: language === 'hi' ? 'ई-कचरा व सर्किट्स' : language === 'mr' ? 'ई-कचरा व डिस्प्ले' : 'E-Waste & PCBs' },
-          { id: 'metals', label: language === 'hi' ? 'तांबा, केबल व धातु' : language === 'mr' ? 'तांबे, केबल व धातू' : 'Copper & Metals' },
-          { id: 'batteries', label: language === 'hi' ? 'बैटरियां' : language === 'mr' ? 'बॅटरी' : 'Batteries' },
-          { id: 'others', label: language === 'hi' ? 'प्लास्टिक, गत्ता व रद्दी' : language === 'mr' ? 'प्लास्टिक व पुठ्ठा' : 'Plastics & Paper' },
+          { id: 'all', label: language === 'hi' ? 'सभी सामग्रियां' : language === 'bn' ? 'সকল বিভাগ' : 'All Categories' },
+          { id: 'ewaste', label: language === 'hi' ? 'ई-कचरा व सर्किट्स' : language === 'bn' ? 'ই-বর্জ্য ও পিসিবি' : 'E-Waste & PCBs' },
+          { id: 'metals', label: language === 'hi' ? 'तांबा, केबल व धातु' : language === 'bn' ? 'তামা, তার ও ধাতু' : 'Copper & Metals' },
+          { id: 'batteries', label: language === 'hi' ? 'बैटरियां' : language === 'bn' ? 'ব্যাটারি' : 'Batteries' },
+          { id: 'others', label: language === 'hi' ? 'प्लास्टिक, गत्ता व रद्दी' : language === 'bn' ? 'প্লাস্টিক ও পিচবোর্ড' : 'Plastics & Paper' },
         ].map((cat) => (
           <button
             key={cat.id}
             id={`price-filter-${cat.id}`}
             type="button"
             onClick={() => setSelectedCategory(cat.id)}
-            className={`rounded-lg px-3.5 py-2 text-xs font-bold transition-colors ${
+            className={`min-h-[44px] rounded-xl px-4 py-2.5 text-xs font-bold transition-all active:scale-95 touch-manipulation ${
               selectedCategory === cat.id
-                ? 'bg-slate-900 text-white shadow-2xs'
+                ? 'bg-slate-900 text-white shadow-xs'
                 : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
             }`}
           >
@@ -141,16 +149,12 @@ export const PriceBoard: React.FC<PriceBoardProps> = ({ language }) => {
               ? mat.labelHi
               : language === 'bn'
               ? (mat.labelBn || mat.label)
-              : language === 'mr'
-              ? (mat.labelMr || mat.label)
               : mat.label;
           const desc =
             language === 'hi'
               ? mat.descriptionHi
               : language === 'bn'
               ? (mat.descriptionBn || mat.description)
-              : language === 'mr'
-              ? (mat.descriptionMr || mat.description)
               : mat.description;
 
           return (
@@ -176,7 +180,7 @@ export const PriceBoard: React.FC<PriceBoardProps> = ({ language }) => {
                   ) : (
                     <span className="inline-flex items-center gap-1 rounded-sm bg-slate-50 px-2 py-0.5 text-xs font-bold text-slate-700 border border-slate-200">
                       <Minus className="h-3.5 w-3.5" />
-                      Steady
+                      {language === 'hi' ? 'स्थिर' : language === 'bn' ? 'স্থিতিশীল' : 'Steady'}
                     </span>
                   )}
                 </div>
@@ -187,7 +191,7 @@ export const PriceBoard: React.FC<PriceBoardProps> = ({ language }) => {
 
                 {mat.hazardousNote && (
                   <div className="mt-2.5 rounded-md border border-amber-200 bg-amber-50/70 px-2.5 py-1.5 text-[11px] font-medium text-amber-900">
-                    <span className="font-bold">Notice:</span> {mat.hazardousNote}
+                    <span className="font-bold">{language === 'hi' ? 'सावधानी:' : language === 'bn' ? 'বিজ্ঞপ্তি:' : 'Notice:'}</span> {mat.hazardousNote}
                   </div>
                 )}
               </div>
@@ -201,7 +205,7 @@ export const PriceBoard: React.FC<PriceBoardProps> = ({ language }) => {
                     </div>
                     <div className="text-2xl font-extrabold text-emerald-700">
                       {formatINR(mat.rate)}
-                      <span className="text-xs font-normal text-slate-600"> / kg</span>
+                      <span className="text-xs font-normal text-slate-600"> {t.perKg}</span>
                     </div>
                   </div>
 

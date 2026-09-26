@@ -40,26 +40,26 @@ export const RecyclerDirectory: React.FC<RecyclerDirectoryProps> = ({
           <div>
             <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-700">
               <ShieldCheck className="h-4 w-4" />
-              <span>CPCB & State PCB Authorized Facility Directory</span>
+              <span>{language === 'hi' ? 'सीपीसीबी व राज्य बोर्ड अधिकृत प्लांट डायरेक्टरी' : language === 'bn' ? 'সিপিসিবি ও রাজ্য বোর্ড অনুমোদিত সুবিধা ডিরেক্টরি' : 'CPCB & State PCB Authorized Facility Directory'}</span>
             </div>
             <h2 className="mt-1 text-xl font-extrabold text-slate-900 sm:text-2xl">
               {language === 'hi'
                 ? 'अधिकृत रीसाइक्लर व एग्रीगेटर डायरेक्टरी'
-                : language === 'mr'
-                ? 'अधिकृत रीसायकलर्स व संकलन केंद्र सूची'
+                : language === 'bn'
+                ? 'অনুমোদিত রিসাইক্লার ও সংগ্রহকারী ডিরেক্টরি'
                 : 'Authorized E-Waste Recyclers & Aggregators'}
             </h2>
             <p className="mt-1 text-xs text-slate-600 sm:text-sm">
               {language === 'hi'
                 ? 'ईपीआर (EPR) नियमों के तहत प्रमाणित प्लांट जो अनौपचारिक कबाड़ियों से सीधे उचित भाव पर माल खरीदते हैं।'
-                : language === 'mr'
-                ? 'ईपीआर नियमांनुसार नोंदणीकृत प्लांट्स जे कबाडी मित्रांकडून थेट योग्य दराने ई-कचरा खरेदी करतात.'
+                : language === 'bn'
+                ? 'ইপিআর বিধি অনুসারে অনুমোদিত প্ল্যান্ট যারা কাবাডিওয়ালাদের থেকে ন্যায্য মূল্যে ই-বর্জ্য সংগ্রহ করে।'
                 : 'Connect directly with certified downstream recovery hubs offering formal pricing premiums and compliant EPR receipts.'}
             </p>
           </div>
 
           <div className="flex items-center gap-2 rounded-lg bg-emerald-50 border border-emerald-200 px-3.5 py-2 text-xs font-bold text-emerald-900">
-            <span>4 Certified Facilities Active</span>
+            <span>{language === 'hi' ? '4 प्रमाणित प्लांट सक्रिय' : language === 'bn' ? '৪টি প্রত্যয়িত সুবিধা সক্রিয়' : '4 Certified Facilities Active'}</span>
           </div>
         </div>
       </div>
@@ -68,7 +68,7 @@ export const RecyclerDirectory: React.FC<RecyclerDirectoryProps> = ({
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-xs font-bold text-slate-600 flex items-center gap-1.5 mr-1">
           <Filter className="h-3.5 w-3.5" />
-          Filter by Scrap Type:
+          {language === 'hi' ? 'कचरा प्रकार अनुसार फ़िल्टर:' : language === 'bn' ? 'স্ক্র্যাপের ধরন অনুযায়ী ফিল্টার:' : 'Filter by Scrap Type:'}
         </span>
         <button
           type="button"
@@ -79,13 +79,14 @@ export const RecyclerDirectory: React.FC<RecyclerDirectoryProps> = ({
               : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
           }`}
         >
-          All Recyclers
+          {language === 'hi' ? 'सभी रीसाइक्लर' : language === 'bn' ? 'সকল রিসাইক্লার' : 'All Recyclers'}
         </button>
         {(['pcb', 'cables', 'batteries', 'motors', 'lcd', 'crt', 'mixed_plastics'] as MaterialKey[]).map(
           (mKey) => {
             const mat = materialCatalog.find((m) => m.key === mKey);
             if (!mat) return null;
             const isSelected = filterMaterial === mKey;
+            const shortLabel = language === 'hi' ? (mat.labelHi.split(' ')[0]) : language === 'bn' ? (mat.labelBn ? mat.labelBn.split(' ')[0] : mat.short) : mat.short;
             return (
               <button
                 key={mKey}
@@ -97,7 +98,7 @@ export const RecyclerDirectory: React.FC<RecyclerDirectoryProps> = ({
                     : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
                 }`}
               >
-                {mat.short}
+                {shortLabel}
               </button>
             );
           }
@@ -120,7 +121,7 @@ export const RecyclerDirectory: React.FC<RecyclerDirectoryProps> = ({
                     <span>{rec.authorizationStatus}</span>
                   </div>
                   <span className="text-xs font-bold text-slate-600">
-                    ~{rec.distanceKm} km away
+                    ~{rec.distanceKm} {language === 'hi' ? 'किमी दूर' : language === 'bn' ? 'কিমি দূরে' : 'km away'}
                   </span>
                 </div>
 
@@ -136,7 +137,7 @@ export const RecyclerDirectory: React.FC<RecyclerDirectoryProps> = ({
                   </div>
                   <div className="flex items-center gap-1.5 text-[11px] text-slate-500 font-mono">
                     <span>Reg: {rec.authorizationNumber}</span>
-                    <span>· Valid to {rec.validUntil}</span>
+                    <span>· {language === 'hi' ? 'वैधता' : language === 'bn' ? 'মেয়াদ' : 'Valid to'} {rec.validUntil}</span>
                   </div>
                 </div>
 
@@ -149,22 +150,23 @@ export const RecyclerDirectory: React.FC<RecyclerDirectoryProps> = ({
                 {/* Accepted Materials & Offered Rates */}
                 <div className="mt-4 border-t border-slate-100 pt-3">
                   <div className="text-xs font-bold text-slate-800 mb-2">
-                    Accepted E-Waste & Direct Buying Rates:
+                    {language === 'hi' ? 'स्वीकृत सामग्री व सीधे खरीद भाव:' : language === 'bn' ? 'গৃহীত সামগ্রী ও সরাসরি ক্রয়ের দর:' : 'Accepted E-Waste & Direct Buying Rates:'}
                   </div>
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     {rec.acceptedMaterials.map((mKey) => {
                       const mat = materialCatalog.find((m) => m.key === mKey);
                       const offeredRate = rec.offeredRates[mKey];
+                      const matLabel = language === 'hi' ? (mat?.labelHi.split(' ')[0] || mKey) : language === 'bn' ? (mat?.labelBn ? mat.labelBn.split(' ')[0] : (mat?.short || mKey)) : (mat?.short || mKey);
                       return (
                         <div
                           key={mKey}
                           className="flex items-center justify-between rounded-md bg-slate-50/80 px-2 py-1.5 border border-slate-200/60"
                         >
                           <span className="text-slate-700 font-medium">
-                            {mat?.short || mKey}
+                            {matLabel}
                           </span>
                           <span className="font-bold text-emerald-700">
-                            {offeredRate ? formatINR(offeredRate) + '/kg' : 'Market'}
+                            {offeredRate ? `${formatINR(offeredRate)}/${t.kgUnit}` : (language === 'hi' ? 'बाजार भाव' : language === 'bn' ? 'বাজারদর' : 'Market')}
                           </span>
                         </div>
                       );
@@ -189,7 +191,7 @@ export const RecyclerDirectory: React.FC<RecyclerDirectoryProps> = ({
                     onClick={() => onInitiateHandoverWithRecycler(rec)}
                     className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-emerald-700"
                   >
-                    <span>Initiate Handover</span>
+                    <span>{language === 'hi' ? 'हैंडओवर शुरू करें' : language === 'bn' ? 'হস্তান্তর শুরু করুন' : 'Initiate Handover'}</span>
                     <ArrowRight className="h-3.5 w-3.5" />
                   </button>
                 )}

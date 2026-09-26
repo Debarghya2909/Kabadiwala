@@ -145,40 +145,56 @@ export const ImpactDashboard: React.FC<ImpactDashboardProps> = ({
     {
       id: 'req-01',
       title: 'Paper & Cardboard (Baled)',
+      titleHi: 'कागज व गत्ता (बेल बंडल)',
+      titleBn: 'কাগজ ও পিচবোর্ড (বেল্ড বান্ডিল)',
       weight: '180 kg',
       rate: '₹14/kg',
       icon: CardboardBoxIcon,
       area: 'Kasba Secondary Aggregation Hub',
+      areaHi: 'कसबा द्वितीयक संग्रहण केंद्र',
+      areaBn: 'কসবা মাধ্যমিক সংগ্রহ হাব',
       collector: 'Raju Das (Trike #4192)',
       status: 'pending',
     },
     {
       id: 'req-02',
       title: 'Plastic (PET & Flakes)',
+      titleHi: 'प्लास्टिक (पीईटी बोतलें व फ्लेक्स)',
+      titleBn: 'প্লাস্টিক (পিইটি বোতল ও ফ্লেক্স)',
       weight: '95 kg',
       rate: '₹18/kg',
       icon: PlasticBottleIcon,
       area: 'Ballygunge Ward 69 Depot',
+      areaHi: 'बालीगंज वार्ड 69 डिपो',
+      areaBn: 'বালিগঞ্জ ওয়ার্ড ৬৯ ডিপো',
       collector: 'Suman Mondal (Partner #108)',
       status: 'pending',
     },
     {
       id: 'req-03',
       title: 'E-Waste (PCBs & Lithium Batteries)',
+      titleHi: 'ई-कचरा (सर्किट बोर्ड व बैटरियां)',
+      titleBn: 'ই-বর্জ্য (সার্কিট বোর্ড ও ব্যাটারি)',
       weight: '42 kg',
       rate: '₹285/kg',
       icon: EwastePhoneIcon,
       area: 'Salt Lake Sector V Depot',
+      areaHi: 'साल्ट लेक सेक्टर 5 डिपो',
+      areaBn: 'সল্টলেক সেক্টর ৫ ডিপো',
       collector: 'Amit Ghosh (Trike #302)',
       status: 'pending',
     },
     {
       id: 'req-04',
       title: 'Scrap Metal (Iron & Copper Cable)',
+      titleHi: 'धातु स्क्रैप (लोहा व तांबे की केबल)',
+      titleBn: 'ধাতব স্ক্র্যাপ (লোহা ও তামার তার)',
       weight: '210 kg',
       rate: '₹28/kg',
       icon: MetalBeamIcon,
       area: 'Gariahat Industrial Axis',
+      areaHi: 'गड़ियाहाट इंडस्ट्रियल एक्सिस',
+      areaBn: 'গড়িয়াহাট ইন্ডাস্ট্রিয়াল অক্ষ',
       collector: 'Bikash Roy (Trike #512)',
       status: 'pending',
     },
@@ -296,13 +312,17 @@ export const ImpactDashboard: React.FC<ImpactDashboardProps> = ({
           <div>
             <div className="inline-flex items-center gap-2 rounded-full bg-purple-50 px-3 py-1 text-xs font-bold text-purple-800 border border-purple-200">
               <ShieldCheck className="h-3.5 w-3.5 text-purple-600" />
-              <span>CPCB & State PCB EPR Institutional Desk</span>
+              <span>{language === 'hi' ? 'सीपीसीबी व राज्य प्रदूषण नियंत्रण बोर्ड ईपीआर डेस्क' : language === 'bn' ? 'সিপিসিবি ও রাজ্য দূষণ নিয়ন্ত্রণ বোর্ড ইপিআর ইনস্টিটিউশনাল ডেস্ক' : 'CPCB & State PCB EPR Institutional Desk'}</span>
             </div>
             <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mt-2">
-              Authorized Recycler & Municipal ESG Dashboard
+              {language === 'hi' ? 'अधिकृत रीसाइक्लर व नगरपालिका ईएसजी डैशबोर्ड' : language === 'bn' ? 'অনুমোদিত রিসাইক্লার ও পৌর ইএসজি ড্যাশবোর্ড' : 'Authorized Recycler & Municipal ESG Dashboard'}
             </h2>
             <p className="mt-1 text-xs text-slate-500 leading-relaxed max-w-2xl">
-              End-to-end municipal solid waste traceability. Monitoring source segregation compliance, verified electronic weighbridge receipts, and direct cash disbursements to informal collectors under E-Waste Rules 2022.
+              {language === 'hi'
+                ? 'शहरी ठोस कचरे की एंड-टू-एंड ट्रैसेबिलिटी। स्रोत पर कचरा पृथक्करण, प्रमाणित इलेक्ट्रॉनिक धर्मकांटा रसीदें और अनौपचारिक कबाड़ियों को सीधे भुगतान।'
+                : language === 'bn'
+                ? 'পৌর কঠিন বর্জ্যের সম্পূর্ণ ট্রেসেবিলিটি। উৎসে বর্জ্য বাছাই, যাচাইকৃত ওয়েব্রিজ রসিদ ও সংগ্রাহকদের সরাসরি অর্থপ্রদান নজরদারি।'
+                : 'End-to-end municipal solid waste traceability. Monitoring source segregation compliance, verified electronic weighbridge receipts, and direct cash disbursements to informal collectors under E-Waste Rules 2022.'}
             </p>
           </div>
 
@@ -313,7 +333,11 @@ export const ImpactDashboard: React.FC<ImpactDashboardProps> = ({
               className="flex items-center gap-1.5 rounded-2xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-emerald-700 transition-colors"
             >
               <Download className="h-4 w-4" />
-              <span>{downloadSuccess ? 'CPCB Audit Exported!' : 'Export Form IV (CSV)'}</span>
+              <span>
+                {downloadSuccess
+                  ? (language === 'hi' ? 'फॉर्म IV ऑडिट डाउनलोड हुआ!' : language === 'bn' ? 'ফর্ম ৪ অডিট ডাউনলোড সম্পন্ন!' : 'CPCB Audit Exported!')
+                  : (language === 'hi' ? 'फॉर्म IV रिपोर्ट एक्सपोर्ट करें (CSV)' : language === 'bn' ? 'ফর্ম ৪ রিপোর্ট এক্সপোর্ট করুন (CSV)' : 'Export Form IV (CSV)')}
+              </span>
             </button>
           </div>
         </div>
@@ -330,16 +354,16 @@ export const ImpactDashboard: React.FC<ImpactDashboardProps> = ({
           >
             <div className="flex items-center justify-between text-emerald-800">
               <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-900">
-                Landfill Diverted
+                {language === 'hi' ? 'लैंडफिल से बचाया' : language === 'bn' ? 'ল্যান্ডফিল থেকে সংরক্ষিত' : 'Landfill Diverted'}
               </span>
               <Recycle className="h-4 w-4 transition-transform group-hover:scale-110" />
             </div>
             <p className="mt-2 text-2xl sm:text-3xl font-black text-emerald-900 tracking-tight">
               {totalWeightDivertedKg.toLocaleString('en-IN')}{' '}
-              <span className="text-sm font-bold text-emerald-700">kg</span>
+              <span className="text-sm font-bold text-emerald-700">{t.kgUnit}</span>
             </p>
             <div className="mt-1 flex items-center justify-between text-[11px] font-bold text-emerald-700">
-              <span>~ {totalCo2SavedTons} tons CO₂ offset</span>
+              <span>~ {totalCo2SavedTons} {language === 'hi' ? 'टन CO₂ बचत' : language === 'bn' ? 'টন CO₂ হ্রাস' : 'tons CO₂ offset'}</span>
               <ChevronRight className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 transition-opacity text-emerald-800" />
             </div>
           </button>
@@ -357,7 +381,7 @@ export const ImpactDashboard: React.FC<ImpactDashboardProps> = ({
           >
             <div className="flex items-center justify-between text-sky-800">
               <span className="text-[11px] font-bold uppercase tracking-wider text-sky-900">
-                Source Segregation
+                {language === 'hi' ? 'स्रोत पर पृथक्करण' : language === 'bn' ? 'উৎসে বর্জ্য বাছাই' : 'Source Segregation'}
               </span>
               <CheckCircle2 className="h-4 w-4 transition-transform group-hover:scale-110" />
             </div>
@@ -365,7 +389,7 @@ export const ImpactDashboard: React.FC<ImpactDashboardProps> = ({
               {segregationComplianceRate}%
             </p>
             <div className="mt-1 flex items-center justify-between text-[11px] font-bold text-sky-700">
-              <span>{segregatedCount} segregated doorstep lots</span>
+              <span>{segregatedCount} {language === 'hi' ? 'सत्यापित अलग किए लॉट' : language === 'bn' ? 'বাছাইকৃত দোরগোড়ার লট' : 'segregated doorstep lots'}</span>
               <ChevronRight className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 transition-opacity text-sky-800" />
             </div>
           </button>
@@ -380,15 +404,15 @@ export const ImpactDashboard: React.FC<ImpactDashboardProps> = ({
           >
             <div className="flex items-center justify-between text-purple-800">
               <span className="text-[11px] font-bold uppercase tracking-wider text-purple-900">
-                Formalized Payouts
+                {language === 'hi' ? 'प्रमाणित नकद भुगतान' : language === 'bn' ? 'আনুষ্ঠানিক মূল্য পরিশোধ' : 'Formalized Payouts'}
               </span>
               <CircleDollarSign className="h-4 w-4 transition-transform group-hover:scale-110" />
             </div>
             <p className="mt-2 text-2xl sm:text-3xl font-black text-purple-900 tracking-tight">
-              ₹ {totalFormalizedPayout.toLocaleString('en-IN')}
+              {formatINR(totalFormalizedPayout)}
             </p>
             <div className="mt-1 flex items-center justify-between text-[11px] font-bold text-purple-700">
-              <span>Direct cash & UPI to collectors</span>
+              <span>{language === 'hi' ? 'कबाड़ियों को सीधा नकद व यूपीआई' : language === 'bn' ? 'সংগ্রাহকদের সরাসরি নগদ ও ইউপিআই' : 'Direct cash & UPI to collectors'}</span>
               <ChevronRight className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 transition-opacity text-purple-800" />
             </div>
           </button>
@@ -403,7 +427,7 @@ export const ImpactDashboard: React.FC<ImpactDashboardProps> = ({
           >
             <div className="flex items-center justify-between text-amber-800">
               <span className="text-[11px] font-bold uppercase tracking-wider text-amber-900">
-                Yard Handovers
+                {language === 'hi' ? 'रीसाइक्लिंग यार्ड हैंडओवर' : language === 'bn' ? 'ইয়ার্ডে বর্জ্য হস্তান্তর' : 'Yard Handovers'}
               </span>
               <Building2 className="h-4 w-4 transition-transform group-hover:scale-110" />
             </div>
@@ -411,7 +435,7 @@ export const ImpactDashboard: React.FC<ImpactDashboardProps> = ({
               {totalBulkHandovers}
             </p>
             <div className="mt-1 flex items-center justify-between text-[11px] font-bold text-amber-800">
-              <span>Formal custody transfer logs</span>
+              <span>{language === 'hi' ? 'अधिकृत कस्टडी रसीदें' : language === 'bn' ? 'অনুমোদিত স্থানান্তর রসিদ' : 'Formal custody transfer logs'}</span>
               <ChevronRight className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 transition-opacity text-amber-900" />
             </div>
           </button>
@@ -419,50 +443,50 @@ export const ImpactDashboard: React.FC<ImpactDashboardProps> = ({
       </div>
 
       {/* Sub-Navigation Tabs within Portal 3 */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1">
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar touch-pan-x">
         <button
           type="button"
           onClick={() => setActiveTab('overview')}
-          className={`rounded-full px-4 py-2 text-xs font-bold transition-all shrink-0 ${
+          className={`min-h-[44px] rounded-full px-4 py-2.5 text-xs font-bold transition-all shrink-0 active:scale-95 touch-manipulation ${
             activeTab === 'overview'
               ? 'bg-emerald-700 text-white shadow-xs'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
           }`}
         >
-          Supply Chain & Bulk Batches
+          {language === 'hi' ? 'सप्लाई चेन व थोक स्क्रैप लॉट' : language === 'bn' ? 'সাপ্লাই চেইন ও পাইকারি লট' : 'Supply Chain & Bulk Batches'}
         </button>
         <button
           type="button"
           onClick={() => setActiveTab('traceability')}
-          className={`rounded-full px-4 py-2 text-xs font-bold transition-all shrink-0 ${
+          className={`min-h-[44px] rounded-full px-4 py-2.5 text-xs font-bold transition-all shrink-0 active:scale-95 touch-manipulation ${
             activeTab === 'traceability'
               ? 'bg-emerald-700 text-white shadow-xs'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
           }`}
         >
-          Traceability & Custody Logs ({traceabilityRecords.length})
+          {language === 'hi' ? 'ट्रैसेबिलिटी व कस्टडी लॉग्स' : language === 'bn' ? 'ট্রেসেবিলিটি ও কাস্টডি খতিয়ান' : 'Traceability & Custody Logs'} ({traceabilityRecords.length})
         </button>
         <button
           type="button"
           onClick={() => setActiveTab('handovers')}
-          className={`rounded-full px-4 py-2 text-xs font-bold transition-all shrink-0 ${
+          className={`min-h-[44px] rounded-full px-4 py-2.5 text-xs font-bold transition-all shrink-0 active:scale-95 touch-manipulation ${
             activeTab === 'handovers'
               ? 'bg-emerald-700 text-white shadow-xs'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
           }`}
         >
-          Authorized Recycler Yards (4)
+          {language === 'hi' ? 'अधिकृत रीसाइक्लिंग यार्ड्स (4)' : language === 'bn' ? 'অনুমোদিত রিসাইক্লিং ইয়ার্ড (৪)' : 'Authorized Recycler Yards (4)'}
         </button>
         <button
           type="button"
           onClick={() => setActiveTab('audit')}
-          className={`rounded-full px-4 py-2 text-xs font-bold transition-all shrink-0 ${
+          className={`min-h-[44px] rounded-full px-4 py-2.5 text-xs font-bold transition-all shrink-0 active:scale-95 touch-manipulation ${
             activeTab === 'audit'
               ? 'bg-emerald-700 text-white shadow-xs'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
           }`}
         >
-          CPCB Form IV Audit Desk
+          {language === 'hi' ? 'सीपीसीबी फॉर्म IV ऑडिट डेस्क' : language === 'bn' ? 'সিপিসিবি ফর্ম ৪ অডিট ডেস্ক' : 'CPCB Form IV Audit Desk'}
         </button>
       </div>
 
@@ -509,14 +533,14 @@ export const ImpactDashboard: React.FC<ImpactDashboardProps> = ({
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-black text-slate-900 tracking-tight">
-                  Incoming Bulk Scrap Batches for Processing
+                  {language === 'hi' ? 'प्रसंस्करण हेतु आवक थोक स्क्रैप लॉट' : language === 'bn' ? 'প্রক্রিয়াকরণের জন্য আগত পাইকারি স্ক্র্যাপ লট' : 'Incoming Bulk Scrap Batches for Processing'}
                 </h3>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Weighed on certified platform scale at secondary aggregation points.
+                  {language === 'hi' ? 'द्वितीयक संकलन केंद्रों पर प्रमाणित धर्मकांटा से तौला गया।' : language === 'bn' ? 'মাধ্যমিক সংগ্রহ পয়েন্টে প্রত্যয়িত প্ল্যাটফর্ম স্কেলে ওজন করা।' : 'Weighed on certified platform scale at secondary aggregation points.'}
                 </p>
               </div>
               <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-800 border border-emerald-200">
-                {availableBatches.filter((b) => b.status === 'pending').length} Batches Ready
+                {availableBatches.filter((b) => b.status === 'pending').length} {language === 'hi' ? 'लॉट तैयार' : language === 'bn' ? 'লট প্রস্তুত' : 'Batches Ready'}
               </span>
             </div>
 
@@ -524,6 +548,11 @@ export const ImpactDashboard: React.FC<ImpactDashboardProps> = ({
               {availableBatches.map((batch) => {
                 const Icon = batch.icon;
                 const isAccepted = batch.status === 'accepted';
+                const title = language === 'hi' ? batch.titleHi : language === 'bn' ? batch.titleBn : batch.title;
+                const area = language === 'hi' ? (batch.areaHi || batch.area) : language === 'bn' ? (batch.areaBn || batch.area) : batch.area;
+                const weight = batch.weight.replace('kg', t.kgUnit);
+                const rate = batch.rate.replace('/kg', `/${t.kgUnit}`).replace('₹', '₹ ');
+
                 return (
                   <div
                     key={batch.id}
@@ -535,34 +564,34 @@ export const ImpactDashboard: React.FC<ImpactDashboardProps> = ({
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <p className="text-xs font-bold text-slate-900">{batch.title}</p>
+                          <p className="text-xs font-bold text-slate-900">{title}</p>
                           <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-black text-emerald-800">
-                            {batch.weight}
+                            {weight}
                           </span>
                         </div>
                         <p className="text-[11px] text-slate-500 font-medium mt-0.5">
-                          {batch.area} · Logged by {batch.collector}
+                          {area} · {language === 'hi' ? 'दर्जकर्ता' : language === 'bn' ? 'নথিভুক্তকারী' : 'Logged by'} {batch.collector}
                         </p>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-2 sm:self-center">
                       <span className="text-xs font-extrabold text-slate-700 mr-1">
-                        {batch.rate}
+                        {rate}
                       </span>
                       {isAccepted ? (
                         <span className="rounded-xl bg-emerald-100 px-3 py-1.5 text-xs font-bold text-emerald-800 flex items-center gap-1">
                           <CheckCircle2 className="h-3.5 w-3.5" />
-                          <span>Accepted</span>
+                          <span>{language === 'hi' ? 'स्वीकृत' : language === 'bn' ? 'গৃহীত' : 'Accepted'}</span>
                         </span>
                       ) : (
                         <button
                           type="button"
-                          onClick={() => handleAcceptBatch(batch.id, batch.title)}
-                          className="flex items-center gap-1 rounded-xl bg-emerald-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-2xs hover:bg-emerald-700 transition-colors"
+                          onClick={() => handleAcceptBatch(batch.id, title)}
+                          className="min-h-[44px] flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-emerald-700 active:scale-95 transition-all touch-manipulation"
                         >
-                          <span>Accept Batch</span>
-                          <ChevronRight className="h-3.5 w-3.5" />
+                          <span>{language === 'hi' ? 'लॉट स्वीकार करें' : language === 'bn' ? 'লট গ্রহণ করুন' : 'Accept Batch'}</span>
+                          <ChevronRight className="h-4 w-4 stroke-[2.5]" />
                         </button>
                       )}
                     </div>
@@ -580,10 +609,10 @@ export const ImpactDashboard: React.FC<ImpactDashboardProps> = ({
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h3 className="text-base font-black text-slate-900 tracking-tight">
-                Traceability & Chain of Custody Audit Ledger
+                {language === 'hi' ? 'ट्रैसेबिलिटी व कस्टडी ऑडिट बहीखाता' : language === 'bn' ? 'ট্রেসেবিলিটি ও কাস্টডি অডিট খতিয়ান' : 'Traceability & Chain of Custody Audit Ledger'}
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
-                Verifiable transactions with lot IDs, digital scale weights, and collector-to-recycler handover proofs.
+                {language === 'hi' ? 'लॉट आईडी, डिजिटल कांटा वजन और रीसाइक्लर हैंडओवर प्रमाण के साथ सत्यापित लेनदेन।' : language === 'bn' ? 'লট আইডি, ডিজিটাল স্কেল ওজন ও রিসাইক্লিং হস্তান্তর প্রমাণসহ যাচাইযোগ্য লেনদেন।' : 'Verifiable transactions with lot IDs, digital scale weights, and collector-to-recycler handover proofs.'}
               </p>
             </div>
 
@@ -594,13 +623,13 @@ export const ImpactDashboard: React.FC<ImpactDashboardProps> = ({
                 onChange={(e) => setFilterMaterial(e.target.value)}
                 className="rounded-xl border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-700 focus:outline-none focus:border-emerald-600"
               >
-                <option value="all">All Materials</option>
-                <option value="Cardboard">Cardboard & Paper</option>
-                <option value="Plastic">Plastic (PET)</option>
-                <option value="Metal">Scrap Metal</option>
-                <option value="Glass">Glass</option>
-                <option value="PCB">E-Waste / PCBs</option>
-                <option value="Battery">Batteries</option>
+                <option value="all">{language === 'hi' ? 'सभी सामग्रियां' : language === 'bn' ? 'সকল সামগ্রী' : 'All Materials'}</option>
+                <option value="Cardboard">{language === 'hi' ? 'कागज व गत्ता (रद्दी)' : language === 'bn' ? 'কাগজ ও পিচবোর্ড (রদ্দি)' : 'Cardboard & Paper'}</option>
+                <option value="Plastic">{language === 'hi' ? 'प्लास्टिक की बोतलें' : language === 'bn' ? 'প্লাস্টিক বোতল' : 'Plastic (PET)'}</option>
+                <option value="Metal">{language === 'hi' ? 'लोहा व तांबा स्क्रैप' : language === 'bn' ? 'লোহা ও তামা স্ক্র্যাপ' : 'Scrap Metal'}</option>
+                <option value="Glass">{language === 'hi' ? 'कांच व शीशियां' : language === 'bn' ? 'কাঁচের বোতল' : 'Glass'}</option>
+                <option value="PCB">{language === 'hi' ? 'ई-कचरा व सर्किट बोर्ड' : language === 'bn' ? 'ই-বর্জ্য ও সার্কিট বোর্ড' : 'E-Waste / PCBs'}</option>
+                <option value="Battery">{language === 'hi' ? 'बैटरियां' : language === 'bn' ? 'ব্যাটারি' : 'Batteries'}</option>
               </select>
             </div>
           </div>
@@ -612,7 +641,7 @@ export const ImpactDashboard: React.FC<ImpactDashboardProps> = ({
               type="text"
               value={traceSearch}
               onChange={(e) => setTraceSearch(e.target.value)}
-              placeholder="Search by Lot ID, collector, resident address, or recycler..."
+              placeholder={language === 'hi' ? 'लॉट आईडी, कबाड़ी साथी, पते या रीसाइक्लर से खोजें...' : language === 'bn' ? 'লট আইডি, সংগ্রাহক পার্টনার, ঠিকানা বা রিসাইকলার দিয়ে খুঁজুন...' : 'Search by Lot ID, collector, resident address, or recycler...'}
               className="w-full text-xs text-slate-800 bg-transparent focus:outline-none"
             />
           </div>
@@ -622,21 +651,21 @@ export const ImpactDashboard: React.FC<ImpactDashboardProps> = ({
             <table className="w-full text-left text-xs text-slate-700">
               <thead className="bg-slate-100 text-[11px] font-black uppercase tracking-wider text-slate-500 border-b border-slate-200">
                 <tr>
-                  <th className="p-3">Lot ID & Date</th>
-                  <th className="p-3">Source & Collector</th>
-                  <th className="p-3">Recycler Yard</th>
-                  <th className="p-3">Material Fractions</th>
-                  <th className="p-3">Weight (kg)</th>
-                  <th className="p-3">Payout</th>
-                  <th className="p-3">Status</th>
-                  <th className="p-3 text-right">Audit</th>
+                  <th className="p-3">{language === 'hi' ? 'लॉट आईडी व दिनांक' : language === 'bn' ? 'লট আইডি ও তারিখ' : 'Lot ID & Date'}</th>
+                  <th className="p-3">{language === 'hi' ? 'स्रोत व कबाड़ी साथी' : language === 'bn' ? 'উৎস ও সংগ্রাহক' : 'Source & Collector'}</th>
+                  <th className="p-3">{language === 'hi' ? 'रीसाइक्लिंग यार्ड' : language === 'bn' ? 'রিসাইক্লিং ইয়ার্ড' : 'Recycler Yard'}</th>
+                  <th className="p-3">{language === 'hi' ? 'सामग्री प्रकार' : language === 'bn' ? 'সামগ্রী বিভাগ' : 'Material Fractions'}</th>
+                  <th className="p-3">{t.weight} ({t.kgUnit})</th>
+                  <th className="p-3">{language === 'hi' ? 'भुगतान राशि' : language === 'bn' ? 'পরিশোধিত মূল্য' : 'Payout'}</th>
+                  <th className="p-3">{language === 'hi' ? 'स्थिति' : language === 'bn' ? 'অবস্থা' : 'Status'}</th>
+                  <th className="p-3 text-right">{language === 'hi' ? 'ऑडिट' : language === 'bn' ? 'অডিট' : 'Audit'}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 bg-white">
                 {filteredTraceability.length === 0 ? (
                   <tr>
                     <td colSpan={8} className="p-6 text-center text-slate-400">
-                      No matching traceability records found.
+                      {language === 'hi' ? 'कोई रिकॉर्ड नहीं मिला।' : language === 'bn' ? 'কোনো রেকর্ড পাওয়া যায়নি।' : 'No matching traceability records found.'}
                     </td>
                   </tr>
                 ) : (
@@ -653,7 +682,7 @@ export const ImpactDashboard: React.FC<ImpactDashboardProps> = ({
                           {rec.source}
                         </p>
                         <p className="text-[11px] text-slate-500 font-medium">
-                          Partner: {rec.collector}
+                          {language === 'hi' ? 'पार्टनर' : language === 'bn' ? 'পার্টনার' : 'Partner'}: {rec.collector}
                         </p>
                       </td>
                       <td className="p-3">
@@ -667,10 +696,10 @@ export const ImpactDashboard: React.FC<ImpactDashboardProps> = ({
                         </span>
                       </td>
                       <td className="p-3 font-mono font-bold text-emerald-800">
-                        {rec.weight} kg
+                        {rec.weight} {t.kgUnit}
                       </td>
                       <td className="p-3 font-mono font-bold text-slate-900">
-                        ₹{rec.payout}
+                        {formatINR(rec.payout)}
                       </td>
                       <td className="p-3">
                         <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold text-emerald-800">
@@ -683,7 +712,7 @@ export const ImpactDashboard: React.FC<ImpactDashboardProps> = ({
                           onClick={() => setSelectedAuditRecord(rec)}
                           className="rounded-lg bg-slate-100 hover:bg-emerald-100 hover:text-emerald-800 text-slate-700 px-2.5 py-1 text-[11px] font-bold transition-colors"
                         >
-                          Certificate
+                          {language === 'hi' ? 'प्रमाणपत्र' : language === 'bn' ? 'সনদপত্র' : 'Certificate'}
                         </button>
                       </td>
                     </tr>
@@ -857,10 +886,10 @@ export const ImpactDashboard: React.FC<ImpactDashboardProps> = ({
                 </div>
                 <div>
                   <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700">
-                    Official Certificate
+                    {language === 'hi' ? 'आधिकारिक प्रमाणपत्र' : language === 'bn' ? 'অফিসিয়াল সার্টিফিকেট' : 'Official Certificate'}
                   </span>
                   <h3 className="text-base font-black text-slate-900">
-                    CPCB EPR Chain of Custody Record
+                    {language === 'hi' ? 'सीपीसीबी ईपीआर कस्टडी सत्यापन रिकॉर्ड' : language === 'bn' ? 'সিপিসিবি ইপিআর কাস্টডি যাচাইকরণ রেকর্ড' : 'CPCB EPR Chain of Custody Record'}
                   </h3>
                 </div>
               </div>
@@ -875,47 +904,47 @@ export const ImpactDashboard: React.FC<ImpactDashboardProps> = ({
 
             <div className="rounded-2xl bg-slate-50 p-4 border border-slate-200 text-xs space-y-2.5 font-medium">
               <div className="flex justify-between">
-                <span className="text-slate-500">Transaction Lot Code:</span>
+                <span className="text-slate-500">{language === 'hi' ? 'ट्रांजेक्शन लॉट कोड:' : language === 'bn' ? 'লেনদেন লট কোড:' : 'Transaction Lot Code:'}</span>
                 <span className="font-mono font-bold text-slate-900">
                   {selectedAuditRecord.lotId}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Verification Timestamp:</span>
+                <span className="text-slate-500">{language === 'hi' ? 'सत्यापन समय:' : language === 'bn' ? 'যাচাইকরণের সময়:' : 'Verification Timestamp:'}</span>
                 <span className="text-slate-800">
                   {formatTimestamp(selectedAuditRecord.timestamp)}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Source Location:</span>
+                <span className="text-slate-500">{language === 'hi' ? 'स्रोत का पता:' : language === 'bn' ? 'উৎসের ঠিকানা:' : 'Source Location:'}</span>
                 <span className="text-slate-800 font-bold truncate max-w-[240px]">
                   {selectedAuditRecord.source}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Field Collector Partner:</span>
+                <span className="text-slate-500">{language === 'hi' ? 'कबाड़ी साथी:' : language === 'bn' ? 'সংগ্রাহক পার্টনার:' : 'Field Collector Partner:'}</span>
                 <span className="text-slate-800 font-bold">{selectedAuditRecord.collector}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Authorized Recycler:</span>
+                <span className="text-slate-500">{language === 'hi' ? 'अधिकृत रीसाइक्लर:' : language === 'bn' ? 'অনুমোদিত রিসাইক্লার:' : 'Authorized Recycler:'}</span>
                 <span className="text-emerald-800 font-bold">{selectedAuditRecord.recycler}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Scale Measured Weight:</span>
+                <span className="text-slate-500">{language === 'hi' ? 'कांटे पर तौला वजन:' : language === 'bn' ? 'স্কেলে পরিমাপিত ওজন:' : 'Scale Measured Weight:'}</span>
                 <span className="font-mono font-black text-slate-900 text-sm">
-                  {selectedAuditRecord.weight} kg
+                  {selectedAuditRecord.weight} {t.kgUnit}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Disbursed Payout:</span>
+                <span className="text-slate-500">{language === 'hi' ? 'भुगतान की गई राशि:' : language === 'bn' ? 'পরিশোধিত মূল্য:' : 'Disbursed Payout:'}</span>
                 <span className="font-mono font-black text-emerald-700 text-sm">
-                  ₹{selectedAuditRecord.payout}
+                  {formatINR(selectedAuditRecord.payout)}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Source Segregation Verified:</span>
+                <span className="text-slate-500">{language === 'hi' ? 'स्रोत पर पृथक्करण सत्यापित:' : language === 'bn' ? 'উৎসে বর্জ্য বাছাই যাচাইকৃত:' : 'Source Segregation Verified:'}</span>
                 <span className="font-bold text-emerald-700">
-                  {selectedAuditRecord.isSegregated ? '✓ Compliant' : 'Mixed Fractions'}
+                  {selectedAuditRecord.isSegregated ? (language === 'hi' ? '✓ अनुपालन पूर्ण' : language === 'bn' ? '✓ নিয়মমাফিক বাছাইকৃত' : '✓ Compliant') : (language === 'hi' ? 'मिश्रित कचरा' : language === 'bn' ? 'মিশ্রিত বর্জ্য' : 'Mixed Fractions')}
                 </span>
               </div>
             </div>
@@ -926,7 +955,7 @@ export const ImpactDashboard: React.FC<ImpactDashboardProps> = ({
                 onClick={() => setSelectedAuditRecord(null)}
                 className="flex-1 rounded-xl border border-slate-200 py-2.5 text-xs font-bold text-slate-600 hover:bg-slate-50"
               >
-                Close
+                {t.cancel}
               </button>
               <button
                 type="button"
@@ -936,7 +965,7 @@ export const ImpactDashboard: React.FC<ImpactDashboardProps> = ({
                 className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 py-2.5 text-xs font-bold text-white hover:bg-emerald-700"
               >
                 <Printer className="h-4 w-4" />
-                <span>Print Certificate</span>
+                <span>{language === 'hi' ? 'सर्टिफिकेट प्रिंट करें' : language === 'bn' ? 'সার্টিফিকেট প্রিন্ট করুন' : 'Print Certificate'}</span>
               </button>
             </div>
           </div>

@@ -1,19 +1,14 @@
 import React, { useState } from 'react';
 import {
-  Recycle,
-  User,
-  ArrowRight,
   ShieldCheck,
+  CheckCircle2,
+  Home,
+  Truck,
   Building2,
+  ArrowRight,
   TreePine,
   Scale,
   Link as LinkIcon,
-  Home,
-  Truck,
-  Layers,
-  Sparkles,
-  Phone,
-  CheckCircle2,
 } from 'lucide-react';
 import { AuthUser, Language, AppView } from '../types';
 import {
@@ -65,11 +60,11 @@ export const LoginView: React.FC<LoginViewProps> = ({
       const user: AuthUser = {
         id: `c-${Date.now().toString(36)}`,
         role: 'collector',
-        name: name.trim() || 'Raju Mondal',
+        name: name.trim() || (language === 'bn' ? 'রাজু মণ্ডল' : language === 'hi' ? 'राजू मंडल' : 'Raju Mondal'),
         phone: phone.trim() || '+91 98310 12345',
         partnerId: `KC-${Math.floor(1000 + Math.random() * 9000)}`,
-        vehicle: 'Electric Cargo Trike (WB-02-AK-4192)',
-        zone: area.trim() || 'Gariahat & South Kolkata',
+        vehicle: language === 'bn' ? 'ইলেকট্রিক কার্গো ট্রাইক' : language === 'hi' ? 'इलेक्ट्रिक कार्गो ट्राइक' : 'Electric Cargo Trike',
+        zone: area.trim() || (language === 'bn' ? 'গড়িয়াহাট ও দক্ষিণ কলকাতা' : language === 'hi' ? 'गड़ियाहाट व दक्षिण कोलकाता' : 'Gariahat & South Kolkata'),
         rating: 4.9,
         completedTrips: 184,
         preferredLanguage: language,
@@ -79,10 +74,10 @@ export const LoginView: React.FC<LoginViewProps> = ({
       const user: AuthUser = {
         id: `r-${Date.now().toString(36)}`,
         role: 'recycler',
-        name: name.trim() || 'Municipal Waste & Recycler Desk',
+        name: name.trim() || (language === 'bn' ? 'পৌর ই-বর্জ্য ও রিসাইক্লার ডেস্ক' : language === 'hi' ? 'नगरपालिका ई-कचरा व रीसाइक्लर डेस्क' : 'Municipal Waste & Recycler Desk'),
         phone: phone.trim() || '+91 33 2286 1000',
         partnerId: 'EPR-AUDIT-KMC-2026',
-        zone: area.trim() || 'Central Municipal Yard',
+        zone: area.trim() || (language === 'bn' ? 'সেন্ট্রাল মিউনিসিপ্যাল ইয়ার্ড' : language === 'hi' ? 'केंद्रीय नगरपालिका यार्ड' : 'Central Municipal Yard'),
         rating: 5.0,
         completedTrips: 1420,
         preferredLanguage: language,
@@ -92,10 +87,10 @@ export const LoginView: React.FC<LoginViewProps> = ({
       const user: AuthUser = {
         id: `h-${Date.now().toString(36)}`,
         role: 'household',
-        name: name.trim() || 'Deblina Mukherjee',
+        name: name.trim() || (language === 'bn' ? 'দেবলীনা মুখার্জি' : language === 'hi' ? 'देबलीना मुखर्जी' : 'Deblina Mukherjee'),
         phone: phone.trim() || '+91 98300 54321',
-        address: area.trim() || 'Flat 3B, Ballygunge Park Road, Kolkata',
-        zone: 'Ballygunge Ward 69',
+        address: area.trim() || (language === 'bn' ? 'ফ্ল্যাট ৩বি, বালিগঞ্জ পার্ক রোড, কলকাতা' : language === 'hi' ? 'फ्लैट 3B, बालीगंज पार्क रोड, कोलकाता' : 'Flat 3B, Ballygunge Park Road, Kolkata'),
+        zone: language === 'bn' ? 'বালিগঞ্জ ওয়ার্ড ৬৯' : language === 'hi' ? 'बालीगंज वार्ड 69' : 'Ballygunge Ward 69',
         completedTrips: 7,
         preferredLanguage: language,
       };
@@ -113,24 +108,23 @@ export const LoginView: React.FC<LoginViewProps> = ({
           <div className="md:col-span-7 space-y-3">
             <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-800 border border-emerald-200">
               <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
-              <span>National Urban Waste Mission • Formal Municipal E-Waste & Scrap Network</span>
+              <span>{t.urbanMissionBanner}</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 leading-tight">
-              Kabadiwala Connect
+              {t.appTitle}
             </h1>
             <p className="text-sm font-medium leading-relaxed text-slate-600">
-              Institutional Solid Waste Segregation, Disposal, and Sanitization Platform.
-              Connecting households directly with informal waste collectors, on-site verified digital scales, and authorized CPCB recycling yards under EPR 2022.
+              {t.loginHeroSubtitle}
             </p>
             <div className="flex flex-wrap items-center gap-2 pt-1 text-xs text-slate-500 font-medium">
               <span className="flex items-center gap-1">
-                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" /> 100% Manual Address (No Maps)
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" /> {t.featureNoMaps}
               </span>
               <span className="flex items-center gap-1">
-                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" /> 4-Digit Security PIN
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" /> {t.featurePin}
               </span>
               <span className="flex items-center gap-1">
-                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" /> CPCB Traceability
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" /> {t.featureEpr}
               </span>
             </div>
           </div>
@@ -141,7 +135,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
               <CollectorHeroIllustration className="w-full h-auto max-h-48 object-contain" />
               <div className="mt-2 text-center">
                 <p className="text-[11px] font-bold text-slate-800">
-                  Doorstep Segregation • Digital Scale • Cash on Delivery
+                  {t.heroDoorstepBadge}
                 </p>
               </div>
             </div>
@@ -153,10 +147,10 @@ export const LoginView: React.FC<LoginViewProps> = ({
       <div>
         <div className="mb-4">
           <h2 className="text-lg sm:text-xl font-black tracking-tight text-slate-900">
-            Select Your Portal
+            {t.selectPortalTitle}
           </h2>
           <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-            Choose your role in the three-sided recycling ecosystem to enter your dedicated, isolated workspace.
+            {t.selectPortalSubtitle}
           </p>
         </div>
 
@@ -173,17 +167,17 @@ export const LoginView: React.FC<LoginViewProps> = ({
                   <Home className="h-6 w-6 stroke-[2.2]" />
                 </div>
                 <span className="rounded-full bg-sky-50 px-2.5 py-1 text-[11px] font-bold text-sky-700 border border-sky-200/80">
-                  Source & Demand Side
+                  {t.portalHouseholdBadge}
                 </span>
               </div>
 
               {/* Title & Description */}
               <div className="mt-4">
                 <h3 className="text-lg font-black tracking-tight text-slate-900 group-hover:text-emerald-700 transition-colors">
-                  1. Household / Citizen Portal
+                  {t.portalHouseholdTitle}
                 </h3>
                 <p className="mt-1.5 text-xs text-slate-600 leading-relaxed">
-                  Practice source segregation across Dry Recyclables, Wet/Compostable Waste, and E-Waste. Request doorstep scrap pickups with manual address entry and live lifecycle tracking.
+                  {t.portalHouseholdDesc}
                 </p>
               </div>
 
@@ -191,19 +185,19 @@ export const LoginView: React.FC<LoginViewProps> = ({
               <ul className="mt-4 space-y-1.5 text-xs text-slate-500 border-t border-slate-100 pt-3">
                 <li className="flex items-center gap-1.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  <span>Itemized scrap selection & est. payout</span>
+                  <span>{language === 'bn' ? 'স্ক্র্যাপ নির্বাচন ও আনুমানিক দর' : language === 'hi' ? 'सामग्री चयन व अनुमानित भाव' : 'Itemized scrap selection & est. payout'}</span>
                 </li>
                 <li className="flex items-center gap-1.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  <span>Doorstep address & landmark entry</span>
+                  <span>{language === 'bn' ? 'সরাসরি দোরগোড়ার ঠিকানা ও ল্যান্ডমার্ক' : language === 'hi' ? 'घर का सीधा पता व लैंडमार्क' : 'Doorstep address & landmark entry'}</span>
                 </li>
                 <li className="flex items-center gap-1.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  <span>4-digit resident security PIN</span>
+                  <span>{language === 'bn' ? '৪-সংখ্যার সিকিউরিটি পিন' : language === 'hi' ? '4-अंकों का सुरक्षा पिन (PIN)' : '4-digit resident security PIN'}</span>
                 </li>
                 <li className="flex items-center gap-1.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  <span>Post-pickup rating & segregation audit</span>
+                  <span>{language === 'bn' ? 'সংগ্রাহকের মূল্যায়ন ও অডিট' : language === 'hi' ? 'पिकअप उपरांत रेटिंग व ऑडिट' : 'Post-pickup rating & segregation audit'}</span>
                 </li>
               </ul>
             </div>
@@ -216,7 +210,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
                 onClick={handleHouseholdLogin}
                 className="flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-600 py-3 text-xs font-bold text-white shadow-xs hover:bg-emerald-700 transition-colors"
               >
-                <span>Enter Household Portal</span>
+                <span>{t.enterHouseholdBtn}</span>
                 <ArrowRight className="h-4 w-4" />
               </button>
 
@@ -225,7 +219,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
                 onClick={() => setShowCustomModal('household')}
                 className="w-full text-center text-[11px] font-semibold text-slate-500 hover:text-emerald-700 py-1"
               >
-                Or enter custom citizen phone / address &rarr;
+                {language === 'bn' ? 'বা কাস্টম নাগরিক তথ্য লিখুন →' : language === 'hi' ? 'या कस्टम नागरिक विवरण लिखें →' : 'Or enter custom citizen phone / address →'}
               </button>
             </div>
           </div>
@@ -242,17 +236,17 @@ export const LoginView: React.FC<LoginViewProps> = ({
                   <Truck className="h-6 w-6 stroke-[2.2]" />
                 </div>
                 <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-bold text-emerald-800 border border-emerald-300">
-                  Execution & Field Side
+                  {t.portalCollectorBadge}
                 </span>
               </div>
 
               {/* Title & Description */}
               <div className="mt-4">
                 <h3 className="text-lg font-black tracking-tight text-slate-900 group-hover:text-emerald-700 transition-colors">
-                  2. Informal Collector Portal
+                  {t.portalCollectorTitle}
                 </h3>
                 <p className="mt-1.5 text-xs text-slate-600 leading-relaxed">
-                  Empowering informal waste collectors and trike partners. Accept nearby household jobs, arrive at doorstep, unlock scale weighing via 4-digit PIN, and track earnings ledger.
+                  {t.portalCollectorDesc}
                 </p>
               </div>
 
@@ -260,19 +254,19 @@ export const LoginView: React.FC<LoginViewProps> = ({
               <ul className="mt-4 space-y-1.5 text-xs text-slate-600 border-t border-emerald-100 pt-3">
                 <li className="flex items-center gap-1.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
-                  <span>Live job queue & 1-click acceptance</span>
+                  <span>{language === 'bn' ? 'লাইভ পিকআপ তালিকা ও গ্রহণ' : language === 'hi' ? 'लाइव जॉब कतार व 1-क्लिक स्वीकृति' : 'Live job queue & 1-click acceptance'}</span>
                 </li>
                 <li className="flex items-center gap-1.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
-                  <span>Doorstep arrival & PIN unlock</span>
+                  <span>{language === 'bn' ? 'দোরগোড়ায় পৌঁছে পিন আনলক' : language === 'hi' ? 'दरवाजे पर पहुंच व पिन द्वारा सत्यापन' : 'Doorstep arrival & PIN unlock'}</span>
                 </li>
                 <li className="flex items-center gap-1.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
-                  <span>Itemized digital scale weight calculator</span>
+                  <span>{language === 'bn' ? 'আইটেমভিত্তিক ডিজিটাল স্কেল তৌল' : language === 'hi' ? 'सामग्री अनुसार कांटा तौल कैलकुलेटर' : 'Itemized digital scale weight calculator'}</span>
                 </li>
                 <li className="flex items-center gap-1.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
-                  <span>Daily earnings ledger & yard handovers</span>
+                  <span>{language === 'bn' ? 'দৈনিক খতিয়ান ও রিসাইক্লারে হস্তান্তর' : language === 'hi' ? 'दैनिक कमाई बहीखाता व प्लांट हैंडओवर' : 'Daily earnings ledger & yard handovers'}</span>
                 </li>
               </ul>
             </div>
@@ -285,7 +279,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
                 onClick={handleCollectorLogin}
                 className="flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-700 py-3 text-xs font-bold text-white shadow-xs hover:bg-emerald-800 transition-colors"
               >
-                <span>Enter Collector Portal</span>
+                <span>{t.enterCollectorBtn}</span>
                 <ArrowRight className="h-4 w-4" />
               </button>
 
@@ -294,7 +288,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
                 onClick={() => setShowCustomModal('collector')}
                 className="w-full text-center text-[11px] font-semibold text-slate-600 hover:text-emerald-800 py-1"
               >
-                Or enter custom collector ID &rarr;
+                {language === 'bn' ? 'বা কাস্টম কবাডিওয়ালা আইডি লিখুন →' : language === 'hi' ? 'या कस्टम कबाड़ीवाला आईडी दर्ज करें →' : 'Or enter custom collector ID →'}
               </button>
             </div>
           </div>
@@ -311,17 +305,17 @@ export const LoginView: React.FC<LoginViewProps> = ({
                   <Building2 className="h-6 w-6 stroke-[2.2]" />
                 </div>
                 <span className="rounded-full bg-purple-50 px-2.5 py-1 text-[11px] font-bold text-purple-700 border border-purple-200/80">
-                  Compliance & ESG Desk
+                  {t.portalRecyclerBadge}
                 </span>
               </div>
 
               {/* Title & Description */}
               <div className="mt-4">
                 <h3 className="text-lg font-black tracking-tight text-slate-900 group-hover:text-emerald-700 transition-colors">
-                  3. Authorized Recycler & Municipal Desk
+                  {t.portalRecyclerTitle}
                 </h3>
                 <p className="mt-1.5 text-xs text-slate-600 leading-relaxed">
-                  Institutional visibility for municipal corporations and formal CPCB recyclers. Dynamic ESG metrics, landfill diversion logs, segregation compliance rate, and chain-of-custody audit.
+                  {t.portalRecyclerDesc}
                 </p>
               </div>
 
@@ -329,19 +323,19 @@ export const LoginView: React.FC<LoginViewProps> = ({
               <ul className="mt-4 space-y-1.5 text-xs text-slate-500 border-t border-slate-100 pt-3">
                 <li className="flex items-center gap-1.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-purple-500" />
-                  <span>Landfill waste diverted (kg) & CO₂ offset</span>
+                  <span>{language === 'bn' ? 'ল্যান্ডফিল বর্জ্য হ্রাস ও কার্বন সাশ্রয়' : language === 'hi' ? 'लैंडफिल से बचाया कचरा व CO₂ बचत' : 'Landfill waste diverted (kg) & CO₂ offset'}</span>
                 </li>
                 <li className="flex items-center gap-1.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-purple-500" />
-                  <span>Source segregation compliance rate %</span>
+                  <span>{language === 'bn' ? 'বর্জ্য পৃথকীকরণ কমপ্লায়েন্স শতাংশ' : language === 'hi' ? 'स्रोत पर कचरा पृथक्करण अनुपालन %' : 'Source segregation compliance rate %'}</span>
                 </li>
                 <li className="flex items-center gap-1.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-purple-500" />
-                  <span>End-to-end traceability audit table</span>
+                  <span>{language === 'bn' ? 'সম্পূর্ণ ট্রেসেবিলিটি অডিট টেবিল' : language === 'hi' ? 'एंड-टू-एंड ट्रैसेबिलिटी ऑडिट तालिका' : 'End-to-end traceability audit table'}</span>
                 </li>
                 <li className="flex items-center gap-1.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-purple-500" />
-                  <span>1-click CPCB Form IV EPR CSV export</span>
+                  <span>{language === 'bn' ? 'সিপিসিবি ফর্ম ৪ ইপিআর ডাটা এক্সপোর্ট' : language === 'hi' ? '1-क्लिक सीपीसीबी फॉर्म IV ईपीआर रिपोर्ट' : '1-click CPCB Form IV EPR CSV export'}</span>
                 </li>
               </ul>
             </div>
@@ -354,7 +348,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
                 onClick={handleRecyclerLogin}
                 className="flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-900 py-3 text-xs font-bold text-white shadow-xs hover:bg-slate-800 transition-colors"
               >
-                <span>Enter Municipal / Recycler Desk</span>
+                <span>{t.enterRecyclerBtn}</span>
                 <ArrowRight className="h-4 w-4" />
               </button>
 
@@ -363,7 +357,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
                 onClick={() => setShowCustomModal('recycler')}
                 className="w-full text-center text-[11px] font-semibold text-slate-500 hover:text-emerald-700 py-1"
               >
-                Or enter institutional credentials &rarr;
+                {language === 'bn' ? 'বা প্রাতিষ্ঠানিক তথ্য দিন →' : language === 'hi' ? 'या संस्थागत क्रेडेंशियल्स दर्ज करें →' : 'Or enter institutional credentials →'}
               </button>
             </div>
           </div>
@@ -377,9 +371,11 @@ export const LoginView: React.FC<LoginViewProps> = ({
             <TreePine className="h-4 w-4" />
           </div>
           <div>
-            <p className="text-xs font-bold text-slate-900">Landfill Diversion</p>
+            <p className="text-xs font-bold text-slate-900">
+              {language === 'bn' ? 'ল্যান্ডফিল বর্জ্য সাশ্রয়' : language === 'hi' ? 'लैंडफिल से बचाव' : 'Landfill Diversion'}
+            </p>
             <p className="text-[11px] text-slate-500">
-              Recover high-purity copper, PCBs, & dry fractions
+              {language === 'bn' ? 'তামা, সার্কিট বোর্ড ও শুকনো বর্জ্য উদ্ধার' : language === 'hi' ? 'शुद्ध तांबा, सर्किट बोर्ड व सूखा कचरा रीसायकल' : 'Recover high-purity copper, PCBs, & dry fractions'}
             </p>
           </div>
         </div>
@@ -389,9 +385,11 @@ export const LoginView: React.FC<LoginViewProps> = ({
             <Scale className="h-4 w-4" />
           </div>
           <div>
-            <p className="text-xs font-bold text-slate-900">Fair Field Weighing</p>
+            <p className="text-xs font-bold text-slate-900">
+              {language === 'bn' ? 'সঠিক স্কেল তৌল' : language === 'hi' ? 'पारदर्शी कांटा तौल' : 'Fair Field Weighing'}
+            </p>
             <p className="text-[11px] text-slate-500">
-              Itemized digital scales with daily EPR benchmark rates
+              {language === 'bn' ? 'ডিজিটাল স্কেল ও নিশ্চিত দৈনিক বাজারদর' : language === 'hi' ? 'डिजिटल कांटा व दैनिक ईपीआर बेंचमार्क रेट' : 'Itemized digital scales with daily EPR benchmark rates'}
             </p>
           </div>
         </div>
@@ -401,9 +399,11 @@ export const LoginView: React.FC<LoginViewProps> = ({
             <LinkIcon className="h-4 w-4" />
           </div>
           <div>
-            <p className="text-xs font-bold text-slate-900">Formal Recycler Link</p>
+            <p className="text-xs font-bold text-slate-900">
+              {language === 'bn' ? 'অনুমোদিত রিসাইক্লিং লিঙ্ক' : language === 'hi' ? 'अधिकृत प्लांट से जुड़ाव' : 'Formal Recycler Link'}
+            </p>
             <p className="text-[11px] text-slate-500">
-              Zero open burning; 100% CPCB yard custody
+              {language === 'bn' ? 'খোলায় না পুড়িয়ে ১০০% সিপিসিবি ইয়ার্ডে হস্তান্তর' : language === 'hi' ? 'बिना खुले जलाए 100% सीपीसीबी यार्ड में हैंडओवर' : 'Zero open burning; 100% CPCB yard custody'}
             </p>
           </div>
         </div>
@@ -415,18 +415,24 @@ export const LoginView: React.FC<LoginViewProps> = ({
           <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl border border-slate-100">
             <h3 className="text-lg font-bold text-slate-900">
               {showCustomModal === 'collector'
-                ? 'Informal Collector Credentials'
+                ? (language === 'bn' ? 'কবাডিওয়ালা সংগ্রাহক তথ্য' : language === 'hi' ? 'कबाड़ीवाला साथी क्रेडेंशियल्स' : 'Informal Collector Credentials')
                 : showCustomModal === 'recycler'
-                ? 'Municipal / Recycler Credentials'
-                : 'Household Citizen Details'}
+                ? (language === 'bn' ? 'পৌরসভা / রিসাইকলার বিবরণ' : language === 'hi' ? 'नगरपालिका / रीसाइक्लर विवरण' : 'Municipal / Recycler Credentials')
+                : (language === 'bn' ? 'নাগরিকের বিস্তারিত তথ্য' : language === 'hi' ? 'नागरिक विवरण' : 'Household Citizen Details')}
             </h3>
             <p className="text-xs text-slate-500 mt-1">
-              Enter your details to personalize your portal session.
+              {language === 'bn'
+                ? 'আপনার সেশন শুরু করতে বিবরণ লিখুন।'
+                : language === 'hi'
+                ? 'अपना सत्र शुरू करने के लिए अपना विवरण दर्ज करें।'
+                : 'Enter your details to personalize your portal session.'}
             </p>
 
             <form onSubmit={handleCustomSubmit} className="mt-4 space-y-3">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Full Name</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  {language === 'bn' ? 'পুরো নাম' : language === 'hi' ? 'पूरा नाम' : 'Full Name'}
+                </label>
                 <input
                   type="text"
                   required
@@ -434,10 +440,10 @@ export const LoginView: React.FC<LoginViewProps> = ({
                   onChange={(e) => setName(e.target.value)}
                   placeholder={
                     showCustomModal === 'collector'
-                      ? 'e.g. Ramesh Mondal'
+                      ? (language === 'bn' ? 'উদাঃ রমেশ মণ্ডল' : language === 'hi' ? 'जैसे रमेश मंडल' : 'e.g. Ramesh Mondal')
                       : showCustomModal === 'recycler'
-                      ? 'e.g. KMC Inspection Officer'
-                      : 'e.g. Ananya Sen'
+                      ? (language === 'bn' ? 'উদাঃ কেএমসি পরিদর্শক' : language === 'hi' ? 'जैसे केएमसी निरीक्षण अधिकारी' : 'e.g. KMC Inspection Officer')
+                      : (language === 'bn' ? 'উদাঃ অনন্যা সেন' : language === 'hi' ? 'जैसे अनन्या सेन' : 'e.g. Ananya Sen')
                   }
                   className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
                 />
@@ -445,7 +451,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Mobile Number / Partner ID
+                  {language === 'bn' ? 'মোবাইল নম্বর / পার্টনার আইডি' : language === 'hi' ? 'मोबाइल नंबर / पार्टनर आईडी' : 'Mobile Number / Partner ID'}
                 </label>
                 <input
                   type="text"
@@ -459,14 +465,16 @@ export const LoginView: React.FC<LoginViewProps> = ({
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Area / Ward / Street Address
+                  {language === 'bn' ? 'অঞ্চল / ওয়ার্ড / ঠিকানা' : language === 'hi' ? 'क्षेत्र / वार्ड / पता' : 'Area / Ward / Street Address'}
                 </label>
                 <input
                   type="text"
                   required
                   value={area}
                   onChange={(e) => setArea(e.target.value)}
-                  placeholder="e.g. Ballygunge Ward 69, Kolkata"
+                  placeholder={
+                    language === 'bn' ? 'উদাঃ বালিগঞ্জ ওয়ার্ড ৬৯, কলকাতা' : language === 'hi' ? 'जैसे बालीगंज वार्ड 69, कोलकाता' : 'e.g. Ballygunge Ward 69, Kolkata'
+                  }
                   className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none"
                 />
               </div>
@@ -477,13 +485,13 @@ export const LoginView: React.FC<LoginViewProps> = ({
                   onClick={() => setShowCustomModal(null)}
                   className="flex-1 rounded-xl border border-slate-200 py-2.5 text-xs font-bold text-slate-600 hover:bg-slate-50"
                 >
-                  Cancel
+                  {t.cancel}
                 </button>
                 <button
                   type="submit"
                   className="flex-1 rounded-xl bg-emerald-600 py-2.5 text-xs font-bold text-white hover:bg-emerald-700"
                 >
-                  Enter Portal
+                  {t.confirm}
                 </button>
               </div>
             </form>
